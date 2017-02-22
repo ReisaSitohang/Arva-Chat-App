@@ -46887,7 +46887,7 @@ define("1a5", ["require", "exports", "module", "157", "1a3", "1a4"], function(re
 $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '198', '134', '135', '136', '153', '152', '13c', '143', '141', '144', '142', '12c', '12d', '146', '13d', '13e', '14a', '157', '14b', '13a', '14d', '151', '139', '140', '14e', '14f', '150', '13f', '138', '1a5', '145'], function (_export, _context3) {
     "use strict";
 
-    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, HomeView, HomeController, _class, _temp, App$$1;
+    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, event, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _dec22, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, HomeView, HomeController, _class, _temp, App$$1;
 
     // A bunch of helper functions.
 
@@ -55321,6 +55321,88 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     };
                 }
             };
+            event = {
+                /**
+                 * Internal function used by the event decorators to generalize the idea of on, once, and off
+                 * @param {String} subscriptionType A type of subscription function, e.g. on
+                 * @param {String} eventName The event name
+                 * @param {Function} callback that is called when event has happened
+                 * @returns {Function}
+                 */
+                _subscribe: function _subscribe(subscriptionType, eventName, callback) {
+                    return function (view, renderableName, descriptor) {
+                        var renderable = prepDecoratedRenderable(view, renderableName, descriptor);
+                        if (!renderable.decorations.eventSubscriptions) {
+                            renderable.decorations.eventSubscriptions = [];
+                        }
+                        renderable.decorations.eventSubscriptions.push({
+                            subscriptionType: subscriptionType,
+                            eventName: eventName,
+                            callback: callback
+                        });
+                    };
+                },
+
+                /**
+                 * @example
+                 * @layout.on('click', function() {this._handleClick})
+                 * thing = new Surface({properties: {backgroundColor: 'red'}});
+                 *
+                 * _handleClick() { ... }
+                 *
+                 * Adds an event listener to the renderable when specific event happened
+                 *
+                 * @param eventName
+                 * @param callback
+                 * @returns {Function} A decorator function
+                 */
+                on: function on(eventName, callback) {
+                    return event._subscribe('on', eventName, callback);
+                },
+
+                /**
+                 * @example
+                 * @layout.size(100,100)
+                 * @layout.stick.center()
+                 * @layout.once('click', function() {this._handleClick})
+                 * thing = new Surface({properties: {backgroundColor: 'red'}});
+                 *
+                 * _handleClick() { ... }
+                 *
+                 * Adds an event listener to the renderable when specific event happened once
+                 *
+                 * @param eventName
+                 * @param callback
+                 * @returns {Function} A decorator function
+                 */
+                once: function once(eventName, callback) {
+                    return event._subscribe('once', eventName, callback);
+                },
+
+                /**
+                 * @example
+                 * @layout.fullSize()
+                 * @layout.pipe('dbsv')
+                 * //Pipe events to another renderable declared above, called 'dbsv'
+                 * scrollableSurface = new Surface();
+                 *
+                 * Pipes events from one renderable to another. The other renderable has to be declared above the one that is doing
+                 * the piping, otherwise an exception will be thrown.
+                 *
+                 * @param pipeToName
+                 * @returns {Function}
+                 */
+                pipe: function pipe(pipeToName) {
+                    return function (view, renderableName, descriptor) {
+                        var renderable = prepDecoratedRenderable(view, renderableName, descriptor);
+                        if (!renderable.decorations.pipes) {
+                            renderable.decorations.pipes = [];
+                        }
+
+                        renderable.decorations.pipes.push(pipeToName);
+                    };
+                }
+            };
             flow = {
                 defaultOptions: function defaultOptions() {
                     var flowOptions = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -55421,11 +55503,25 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     };
                 }
             };
-            HomeView = (_dec$4 = layout$1.size(1000, 100), _dec2$1 = layout$1.fullSize(), _dec3 = layout$1.stick.top(), _dec4 = layout$1.animate({
+            HomeView = (_dec$4 = layout$1.size(1000, 100), _dec2$1 = layout$1.stick.top(), _dec3 = layout$1.animate({
                 animation: AnimationController.Animation.FadedZoom,
                 transition: { duration: 1000 }
-            }), _dec5 = layout$1.translate(0, 0, -10), _dec6 = layout$1.fullSize(), _dec7 = layout$1.size(500, 50), _dec8 = layout$1.dock.bottom(), _dec9 = layout$1.stick.center(), _dec10 = layout$1.size(500, 100), _dec11 = layout$1.dock.bottom(), _dec12 = layout$1.stick.center(), _dec13 = layout$1.size(100, 100), _dec14 = layout$1.dock.bottom(), _dec15 = layout$1.stick.right(), (_class$6 = function (_View) {
+            }), _dec4 = layout$1.translate(0, 0, -10), _dec5 = layout$1.fullSize(), _dec6 = layout$1.size(500, 500), _dec7 = layout$1.stick.center(), _dec8 = layout$1.size(500, 50), _dec9 = layout$1.dock.bottom(), _dec10 = layout$1.stick.center(), _dec11 = layout$1.size(500, 50), _dec12 = layout$1.dock.bottom(), _dec13 = layout$1.stick.center(), _dec14 = event.on('click', function () {
+                this.showRenderable('submitedmessage');
+            }), _dec15 = layout$1.size(300, 25), _dec16 = layout$1.translate(0, 100, 0), _dec17 = layout$1.animate({
+                showInitially: false,
+                animation: AnimationController.Animation.Slide.Left,
+                transition: { duration: 500 }
+            }), _dec18 = layout$1.stick.center(), _dec19 = layout$1.size(500, 100), _dec20 = layout$1.dock.bottom(), _dec21 = layout$1.stick.center(), _dec22 = event.on('keyup', function (e) {
+                if (e.keyCode == 13) {
+                    this.showRenderable('submitedmessage');
+                }
+            }), (_class$6 = function (_View) {
                 _inherits(HomeView, _View);
+
+                //Footer space
+
+                //Background
 
                 function HomeView() {
                     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -55434,60 +55530,84 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
 
                     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HomeView).call(this, options));
 
-                    _initDefineProp(_this, 'message', _descriptor, _this);
+                    _initDefineProp(_this, 'title', _descriptor, _this);
 
                     _initDefineProp(_this, 'background', _descriptor2, _this);
 
-                    _initDefineProp(_this, 'footer', _descriptor3, _this);
+                    _initDefineProp(_this, 'messages', _descriptor3, _this);
 
-                    _initDefineProp(_this, 'chatmessage', _descriptor4, _this);
+                    _initDefineProp(_this, 'footerspace', _descriptor4, _this);
 
                     _initDefineProp(_this, 'sendbutton', _descriptor5, _this);
+
+                    _initDefineProp(_this, 'submitedmessage', _descriptor6, _this);
+
+                    _initDefineProp(_this, 'chatmessage', _descriptor7, _this);
 
                     return _this;
                 }
 
+                //Inputfield for chat message
+
+                //Sendbutton
+
+                //View messages area container
+
+
                 return HomeView;
-            }(View), (_descriptor = _applyDecoratedDescriptor(_class$6.prototype, 'message', [_dec$4, _dec2$1, _dec3, _dec4], {
+            }(View), (_descriptor = _applyDecoratedDescriptor(_class$6.prototype, 'title', [_dec$4, _dec2$1, _dec3], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new Surface({
-                        content: 'Welcome to Arva Chat App',
+                        content: 'Arva Chat App',
                         properties: {
                             textAlign: 'center',
-                            color: 'gray',
-                            size: '100%'
+                            color: 'gray'
                         }
                     });
                 }
-            }), _descriptor2 = _applyDecoratedDescriptor(_class$6.prototype, 'background', [_dec5, _dec6], {
+            }), _descriptor2 = _applyDecoratedDescriptor(_class$6.prototype, 'background', [_dec4, _dec5], {
                 enumerable: true,
                 initializer: function initializer() {
-                    return new Surface({ properties: { backgroundColor: 'pink' } });
+                    return new Surface({ properties: { backgroundColor: 'blanchedalmond' } });
                 }
-            }), _descriptor3 = _applyDecoratedDescriptor(_class$6.prototype, 'footer', [_dec7, _dec8, _dec9], {
+            }), _descriptor3 = _applyDecoratedDescriptor(_class$6.prototype, 'messages', [_dec6, _dec7], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface({
+                        properties: {
+                            backgroundColor: 'lightblue'
+                        }
+                    });
+                }
+            }), _descriptor4 = _applyDecoratedDescriptor(_class$6.prototype, 'footerspace', [_dec8, _dec9, _dec10], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new Surface({});
                 }
-            }), _descriptor4 = _applyDecoratedDescriptor(_class$6.prototype, 'chatmessage', [_dec10, _dec11, _dec12], {
-                enumerable: true,
-                initializer: function initializer() {
-                    return new InputSurface({
-                        placeholder: '... ... ...',
-                        properties: {
-                            textAlign: 'center',
-                            color: 'black',
-                            padding: '20px'
-                        }
-                    });
-                }
-            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec13, _dec14, _dec15], {
+            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec11, _dec12, _dec13, _dec14], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new InputSurface({
                         value: 'Send',
                         type: 'button',
+                        properties: {
+                            backgroundColor: 'lightblue',
+                            borderRadius: '10px',
+                            marginTop: '10px'
+                        }
+                    });
+                }
+            }), _descriptor6 = _applyDecoratedDescriptor(_class$6.prototype, 'submitedmessage', [_dec15, _dec16, _dec17, _dec18], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface({ content: 'How to put the stuffss?', properties: { textAlign: 'center' } });
+                }
+            }), _descriptor7 = _applyDecoratedDescriptor(_class$6.prototype, 'chatmessage', [_dec19, _dec20, _dec21, _dec22], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new InputSurface({
+                        placeholder: '... ... ...',
                         properties: {
                             textAlign: 'center',
                             color: 'black',
