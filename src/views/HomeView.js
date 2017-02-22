@@ -42,6 +42,19 @@ export class HomeView extends View {
 		}
 	})
 
+	@layout.size(100, 100)
+	@layout.dock.bottom()
+    @layout.stick.right()
+	sendbutton  = new InputSurface({
+			value: `Send`,
+			type: 'button', 
+			properties: {
+			textAlign: 'center',
+			color: 'black',
+			padding: '20px'
+		}
+	})
+
     constructor(options = {}){
         super(options);
     }

@@ -35872,8 +35872,8 @@ $__System.register("144", [], function() { return { setters: [], execute: functi
 
 (function() {
 var define = $__System.amdDefine;
-define("1a5", ["require", "exports", "module", "149"], function(require, exports, module) {
-  var Surface = require('149');
+define("145", ["require", "exports", "module", "146"], function(require, exports, module) {
+  var Surface = require('146');
   function InputSurface(options) {
     this._placeholder = options.placeholder || '';
     this._value = options.value || '';
@@ -35943,11 +35943,11 @@ define("1a5", ["require", "exports", "module", "149"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13d", ["require", "exports", "module", "145", "146", "13f", "147"], function(require, exports, module) {
-  var EventHandler = require('145');
-  var OptionsManager = require('146');
+define("13d", ["require", "exports", "module", "147", "148", "13f", "149"], function(require, exports, module) {
+  var EventHandler = require('147');
+  var OptionsManager = require('148');
   var RenderNode = require('13f');
-  var Utility = require('147');
+  var Utility = require('149');
   function View(options) {
     this._node = new RenderNode();
     this._eventInput = new EventHandler();
@@ -35985,8 +35985,8 @@ define("13d", ["require", "exports", "module", "145", "146", "13f", "147"], func
 })();
 (function() {
 var define = $__System.amdDefine;
-define("148", ["require", "exports", "module", "149"], function(require, exports, module) {
-  var Surface = require('149');
+define("14a", ["require", "exports", "module", "146"], function(require, exports, module) {
+  var Surface = require('146');
   function ImageSurface(options) {
     this._imageUrl = undefined;
     Surface.apply(this, arguments);
@@ -36054,7 +36054,7 @@ define("148", ["require", "exports", "module", "149"], function(require, exports
 });
 
 })();
-$__System.registerDynamic('14a', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('14b', [], true, function ($__require, exports, module) {
   /*jshint browserify: true, es3: true */
   'use strict';
 
@@ -36283,7 +36283,7 @@ $__System.registerDynamic('14a', [], true, function ($__require, exports, module
 });
 (function() {
 var define = $__System.amdDefine;
-define("14b", ["require", "exports", "module"], function(require, exports, module) {
+define("14c", ["require", "exports", "module"], function(require, exports, module) {
   var Utilities = {};
   Utilities.clamp = function clamp(value, range) {
     return Math.max(Math.min(value, range[1]), range[0]);
@@ -36301,14 +36301,14 @@ define("14b", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("14c", ["require", "exports", "module", "139", "13a", "145", "14b", "14d", "14e", "14f"], function(require, exports, module) {
+define("14d", ["require", "exports", "module", "139", "13a", "147", "14c", "14e", "14f", "150"], function(require, exports, module) {
   var Transform = require('139');
   var Transitionable = require('13a');
-  var EventHandler = require('145');
-  var Utilities = require('14b');
-  var GenericSync = require('14d');
-  var MouseSync = require('14e');
-  var TouchSync = require('14f');
+  var EventHandler = require('147');
+  var Utilities = require('14c');
+  var GenericSync = require('14e');
+  var MouseSync = require('14f');
+  var TouchSync = require('150');
   GenericSync.register({
     'mouse': MouseSync,
     'touch': TouchSync
@@ -36472,9 +36472,9 @@ define("14c", ["require", "exports", "module", "139", "13a", "145", "14b", "14d"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("150", ["require", "exports", "module", "149", "151"], function(require, exports, module) {
-  var Surface = require('149');
-  var Context = require('151');
+define("151", ["require", "exports", "module", "146", "152"], function(require, exports, module) {
+  var Surface = require('146');
+  var Context = require('152');
   function ContainerSurface(options) {
     Surface.call(this, options);
     this._container = document.createElement('div');
@@ -36516,8 +36516,8 @@ define("150", ["require", "exports", "module", "149", "151"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("140", ["require", "exports", "module", "152"], function(require, exports, module) {
-  var FamousEngine = require('152');
+define("140", ["require", "exports", "module", "153"], function(require, exports, module) {
+  var FamousEngine = require('153');
   var _event = 'prerender';
   var getTime = (window.performance && window.performance.now) ? function() {
     return window.performance.now();
@@ -36614,8 +36614,8 @@ define("140", ["require", "exports", "module", "152"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("14d", ["require", "exports", "module", "145"], function(require, exports, module) {
-  var EventHandler = require('145');
+define("14e", ["require", "exports", "module", "147"], function(require, exports, module) {
+  var EventHandler = require('147');
   function GenericSync(syncs, options) {
     this._eventInput = new EventHandler();
     this._eventOutput = new EventHandler();
@@ -36675,9 +36675,9 @@ define("14d", ["require", "exports", "module", "145"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("14e", ["require", "exports", "module", "145", "146"], function(require, exports, module) {
-  var EventHandler = require('145');
-  var OptionsManager = require('146');
+define("14f", ["require", "exports", "module", "147", "148"], function(require, exports, module) {
+  var EventHandler = require('147');
+  var OptionsManager = require('148');
   function MouseSync(options) {
     this.options = Object.create(MouseSync.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
@@ -36864,8 +36864,8 @@ define("14e", ["require", "exports", "module", "145", "146"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("153", ["require", "exports", "module", "145"], function(require, exports, module) {
-  var EventHandler = require('145');
+define("154", ["require", "exports", "module", "147"], function(require, exports, module) {
+  var EventHandler = require('147');
   var _now = Date.now;
   function _timestampTouch(touch, event, history) {
     return {
@@ -36953,10 +36953,10 @@ define("153", ["require", "exports", "module", "145"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("14f", ["require", "exports", "module", "153", "145", "146"], function(require, exports, module) {
-  var TouchTracker = require('153');
-  var EventHandler = require('145');
-  var OptionsManager = require('146');
+define("150", ["require", "exports", "module", "154", "147", "148"], function(require, exports, module) {
+  var TouchTracker = require('154');
+  var EventHandler = require('147');
+  var OptionsManager = require('148');
   function TouchSync(options) {
     this.options = Object.create(TouchSync.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
@@ -37079,10 +37079,10 @@ define("14f", ["require", "exports", "module", "153", "145", "146"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13b", ["require", "exports", "module", "13a", "139", "147"], function(require, exports, module) {
+define("13b", ["require", "exports", "module", "13a", "139", "149"], function(require, exports, module) {
   var Transitionable = require('13a');
   var Transform = require('139');
-  var Utility = require('147');
+  var Utility = require('149');
   function TransitionableTransform(transform) {
     this._final = Transform.identity.slice();
     this._finalTranslate = [0, 0, 0];
@@ -37425,7 +37425,7 @@ define("138", ["require", "exports", "module", "139", "13a", "13b"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("154", ["require", "exports", "module"], function(require, exports, module) {
+define("155", ["require", "exports", "module"], function(require, exports, module) {
   function ViewSequence(options) {
     if (!options)
       options = [];
@@ -37663,8 +37663,8 @@ define("154", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("155", ["require", "exports", "module", "156"], function(require, exports, module) {
-  var LayoutUtility = require('156');
+define("156", ["require", "exports", "module", "157"], function(require, exports, module) {
+  var LayoutUtility = require('157');
   function LayoutDockHelper(context, options) {
     var size = context.size;
     this._size = size;
@@ -37800,19 +37800,19 @@ define("155", ["require", "exports", "module", "156"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13e", ["require", "exports", "module", "147", "157", "154", "158", "146", "145", "156", "159", "15a", "15b", "139", "155"], function(require, exports, module) {
-  var Utility = require('147');
-  var Entity = require('157');
-  var ViewSequence = require('154');
-  var LinkedListViewSequence = require('158');
-  var OptionsManager = require('146');
-  var EventHandler = require('145');
-  var LayoutUtility = require('156');
-  var LayoutNodeManager = require('159');
-  var LayoutNode = require('15a');
-  var FlowLayoutNode = require('15b');
+define("13e", ["require", "exports", "module", "149", "158", "155", "159", "148", "147", "157", "15a", "15b", "15c", "139", "156"], function(require, exports, module) {
+  var Utility = require('149');
+  var Entity = require('158');
+  var ViewSequence = require('155');
+  var LinkedListViewSequence = require('159');
+  var OptionsManager = require('148');
+  var EventHandler = require('147');
+  var LayoutUtility = require('157');
+  var LayoutNodeManager = require('15a');
+  var LayoutNode = require('15b');
+  var FlowLayoutNode = require('15c');
   var Transform = require('139');
-  require('155');
+  require('156');
   function LayoutController(options, nodeManager) {
     this.id = Entity.register(this);
     this._isDirty = true;
@@ -38412,7 +38412,7 @@ define("13e", ["require", "exports", "module", "147", "157", "154", "158", "146"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("15c", ["require", "exports", "module"], function(require, exports, module) {
+define("15d", ["require", "exports", "module"], function(require, exports, module) {
   function LayoutContext(methods) {
     for (var n in methods) {
       this[n] = methods[n];
@@ -38432,7 +38432,7 @@ define("15c", ["require", "exports", "module"], function(require, exports, modul
 });
 
 })();
-$__System.registerDynamic('15d', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('15e', [], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
@@ -38470,7 +38470,7 @@ $__System.registerDynamic('15d', [], true, function ($__require, exports, module
 	};
 	return module.exports;
 });
-$__System.registerDynamic('15e', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('15f', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -38484,7 +38484,7 @@ $__System.registerDynamic('15e', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('15f', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('160', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -38498,24 +38498,24 @@ $__System.registerDynamic('15f', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('160', ['15e', '15f', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('161', ['15f', '160', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('15e')() ? Math.sign : $__require('15f');
+	module.exports = $__require('15f')() ? Math.sign : $__require('160');
 	return module.exports;
 });
-$__System.registerDynamic('161', ['160', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('162', ['161', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var sign = $__require('160'),
+	var sign = $__require('161'),
 	    abs = Math.abs,
 	    floor = Math.floor;
 
@@ -38527,14 +38527,14 @@ $__System.registerDynamic('161', ['160', '5'], true, function ($__require, expor
 	};
 	return module.exports;
 });
-$__System.registerDynamic('162', ['161', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('163', ['162', '5'], true, function ($__require, exports, module) {
   'use strict';
 
   var process = $__require('5');
   var define,
       global = this || self,
       GLOBAL = global;
-  var toInteger = $__require('161'),
+  var toInteger = $__require('162'),
       max = Math.max;
 
   module.exports = function (value) {
@@ -38542,15 +38542,15 @@ $__System.registerDynamic('162', ['161', '5'], true, function ($__require, expor
   };
   return module.exports;
 });
-$__System.registerDynamic('163', ['162', '164', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('164', ['163', '165', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var toPosInt = $__require('162'),
-	    value = $__require('164'),
+	var toPosInt = $__require('163'),
+	    value = $__require('165'),
 	    indexOf = Array.prototype.indexOf,
 	    hasOwnProperty = Object.prototype.hasOwnProperty,
 	    abs = Math.abs,
@@ -38577,14 +38577,14 @@ $__System.registerDynamic('163', ['162', '164', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('165', ['166', '167'], true, function ($__require, exports, module) {
+$__System.registerDynamic('166', ['167', '168'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var d = $__require('166'),
-	    callable = $__require('167'),
+	var d = $__require('167'),
+	    callable = $__require('168'),
 	    apply = Function.prototype.apply,
 	    call = Function.prototype.call,
 	    create = Object.create,
@@ -38716,16 +38716,16 @@ $__System.registerDynamic('165', ['166', '167'], true, function ($__require, exp
 	exports.methods = methods;
 	return module.exports;
 });
-$__System.registerDynamic('168', ['16a', '16b', '166', '169'], true, function ($__require, exports, module) {
+$__System.registerDynamic('169', ['16b', '16c', '167', '16a'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var setPrototypeOf = $__require('16a'),
-	    contains = $__require('16b'),
-	    d = $__require('166'),
-	    Iterator = $__require('169'),
+	var setPrototypeOf = $__require('16b'),
+	    contains = $__require('16c'),
+	    d = $__require('167'),
+	    Iterator = $__require('16a'),
 	    defineProperty = Object.defineProperty,
 	    ArrayIterator;
 
@@ -38750,7 +38750,7 @@ $__System.registerDynamic('168', ['16a', '16b', '166', '169'], true, function ($
 	});
 	return module.exports;
 });
-$__System.registerDynamic('16c', ['16a', '166', '169'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16d', ['16b', '167', '16a'], true, function ($__require, exports, module) {
 	// Thanks @mathiasbynens
 	// http://mathiasbynens.be/notes/javascript-unicode#iterating-over-symbols
 
@@ -38759,9 +38759,9 @@ $__System.registerDynamic('16c', ['16a', '166', '169'], true, function ($__requi
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var setPrototypeOf = $__require('16a'),
-	    d = $__require('166'),
-	    Iterator = $__require('169'),
+	var setPrototypeOf = $__require('16b'),
+	    d = $__require('167'),
+	    Iterator = $__require('16a'),
 	    defineProperty = Object.defineProperty,
 	    StringIterator;
 
@@ -38794,7 +38794,7 @@ $__System.registerDynamic('16c', ['16a', '166', '169'], true, function ($__requi
 	});
 	return module.exports;
 });
-$__System.registerDynamic('16d', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16e', ['5'], true, function ($__require, exports, module) {
   'use strict';
 
   var process = $__require('5');
@@ -38811,7 +38811,7 @@ $__System.registerDynamic('16d', ['5'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic('16e', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16f', ['5'], true, function ($__require, exports, module) {
 		'use strict';
 
 		var process = $__require('5');
@@ -38826,15 +38826,15 @@ $__System.registerDynamic('16e', ['5'], true, function ($__require, exports, mod
 		};
 		return module.exports;
 });
-$__System.registerDynamic('16f', ['16d', '16e', '170'], true, function ($__require, exports, module) {
+$__System.registerDynamic('170', ['16e', '16f', '171'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isArguments = $__require('16d'),
-	    isString = $__require('16e'),
-	    iteratorSymbol = $__require('170').iterator,
+	var isArguments = $__require('16e'),
+	    isString = $__require('16f'),
+	    iteratorSymbol = $__require('171').iterator,
 	    isArray = Array.isArray;
 
 	module.exports = function (value) {
@@ -38846,13 +38846,13 @@ $__System.registerDynamic('16f', ['16d', '16e', '170'], true, function ($__requi
 	};
 	return module.exports;
 });
-$__System.registerDynamic('171', ['16f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('172', ['170'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isIterable = $__require('16f');
+	var isIterable = $__require('170');
 
 	module.exports = function (value) {
 		if (!isIterable(value)) throw new TypeError(value + " is not iterable");
@@ -38860,18 +38860,18 @@ $__System.registerDynamic('171', ['16f'], true, function ($__require, exports, m
 	};
 	return module.exports;
 });
-$__System.registerDynamic('172', ['16d', '16e', '168', '16c', '171', '170'], true, function ($__require, exports, module) {
+$__System.registerDynamic('173', ['16e', '16f', '169', '16d', '172', '171'], true, function ($__require, exports, module) {
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var isArguments = $__require('16d'),
-      isString = $__require('16e'),
-      ArrayIterator = $__require('168'),
-      StringIterator = $__require('16c'),
-      iterable = $__require('171'),
-      iteratorSymbol = $__require('170').iterator;
+  var isArguments = $__require('16e'),
+      isString = $__require('16f'),
+      ArrayIterator = $__require('169'),
+      StringIterator = $__require('16d'),
+      iterable = $__require('172'),
+      iteratorSymbol = $__require('171').iterator;
 
   module.exports = function (obj) {
     if (typeof iterable(obj)[iteratorSymbol] === 'function') return obj[iteratorSymbol]();
@@ -38881,16 +38881,16 @@ $__System.registerDynamic('172', ['16d', '16e', '168', '16c', '171', '170'], tru
   };
   return module.exports;
 });
-$__System.registerDynamic('173', ['16d', '167', '16e', '172'], true, function ($__require, exports, module) {
+$__System.registerDynamic('174', ['16e', '168', '16f', '173'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isArguments = $__require('16d'),
-	    callable = $__require('167'),
-	    isString = $__require('16e'),
-	    get = $__require('172'),
+	var isArguments = $__require('16e'),
+	    callable = $__require('168'),
+	    isString = $__require('16f'),
+	    get = $__require('173'),
 	    isArray = Array.isArray,
 	    call = Function.prototype.call,
 	    some = Array.prototype.some;
@@ -38941,7 +38941,7 @@ $__System.registerDynamic('173', ['16d', '167', '16e', '172'], true, function ($
 	};
 	return module.exports;
 });
-$__System.registerDynamic('174', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('175', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -38955,7 +38955,7 @@ $__System.registerDynamic('174', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('175', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('176', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -38974,7 +38974,7 @@ $__System.registerDynamic('175', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('176', ['175', '177', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('177', ['176', '178', '5'], true, function ($__require, exports, module) {
 	// Workaround for http://code.google.com/p/v8/issues/detail?id=2804
 
 	'use strict';
@@ -38986,8 +38986,8 @@ $__System.registerDynamic('176', ['175', '177', '5'], true, function ($__require
 	var create = Object.create,
 	    shim;
 
-	if (!$__require('175')()) {
-		shim = $__require('177');
+	if (!$__require('176')()) {
+		shim = $__require('178');
 	}
 
 	module.exports = function () {
@@ -39018,7 +39018,7 @@ $__System.registerDynamic('176', ['175', '177', '5'], true, function ($__require
 	}();
 	return module.exports;
 });
-$__System.registerDynamic('177', ['174', '164', '176', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('178', ['175', '165', '177', '5'], true, function ($__require, exports, module) {
 	// Big thanks to @WebReflection for sorting this out
 	// https://gist.github.com/WebReflection/5593554
 
@@ -39028,8 +39028,8 @@ $__System.registerDynamic('177', ['174', '164', '176', '5'], true, function ($__
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isObject = $__require('174'),
-	    value = $__require('164'),
+	var isObject = $__require('175'),
+	    value = $__require('165'),
 	    isPrototypeOf = Object.prototype.isPrototypeOf,
 	    defineProperty = Object.defineProperty,
 	    nullDesc = { configurable: true, enumerable: false, writable: true,
@@ -39096,20 +39096,20 @@ $__System.registerDynamic('177', ['174', '164', '176', '5'], true, function ($__
 		return false;
 	}());
 
-	$__require('176');
+	$__require('177');
 	return module.exports;
 });
-$__System.registerDynamic('16a', ['175', '177', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16b', ['176', '178', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('175')() ? Object.setPrototypeOf : $__require('177');
+	module.exports = $__require('176')() ? Object.setPrototypeOf : $__require('178');
 	return module.exports;
 });
-$__System.registerDynamic('178', ['164', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('179', ['165', '5'], true, function ($__require, exports, module) {
 	// Inspired by Google Closure:
 	// http://closure-library.googlecode.com/svn/docs/
 	// closure_goog_array_array.js.html#goog.array.clear
@@ -39120,7 +39120,7 @@ $__System.registerDynamic('178', ['164', '5'], true, function ($__require, expor
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var value = $__require('164');
+	var value = $__require('165');
 
 	module.exports = function () {
 		value(this).length = 0;
@@ -39128,15 +39128,15 @@ $__System.registerDynamic('178', ['164', '5'], true, function ($__require, expor
 	};
 	return module.exports;
 });
-$__System.registerDynamic('179', ['17a', '164', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17a', ['17b', '165', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var assign = $__require('17a'),
-	    value = $__require('164');
+	var assign = $__require('17b'),
+	    value = $__require('165');
 
 	module.exports = function (obj) {
 		var copy = Object(value(obj));
@@ -39145,7 +39145,7 @@ $__System.registerDynamic('179', ['17a', '164', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17b', ['167', '164', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17c', ['168', '165', '5'], true, function ($__require, exports, module) {
 	// Internal method, used by iteration functions.
 	// Calls a function for each key-value pair found in object
 	// Optionally takes compareFn to iterate object in specific order
@@ -39156,8 +39156,8 @@ $__System.registerDynamic('17b', ['167', '164', '5'], true, function ($__require
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var callable = $__require('167'),
-	    value = $__require('164'),
+	var callable = $__require('168'),
+	    value = $__require('165'),
 	    bind = Function.prototype.bind,
 	    call = Function.prototype.call,
 	    keys = Object.keys,
@@ -39184,25 +39184,25 @@ $__System.registerDynamic('17b', ['167', '164', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17c', ['17b', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17d', ['17c', '5'], true, function ($__require, exports, module) {
   'use strict';
 
   var process = $__require('5');
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require('17b')('forEach');
+  module.exports = $__require('17c')('forEach');
   return module.exports;
 });
-$__System.registerDynamic('17d', ['167', '17c', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17e', ['168', '17d', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var callable = $__require('167'),
-	    forEach = $__require('17c'),
+	var callable = $__require('168'),
+	    forEach = $__require('17d'),
 	    call = Function.prototype.call;
 
 	module.exports = function (obj, cb /*, thisArg*/) {
@@ -39216,7 +39216,7 @@ $__System.registerDynamic('17d', ['167', '17c', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('167', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('168', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39229,16 +39229,16 @@ $__System.registerDynamic('167', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17e', ['179', '17d', '167', '164'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17f', ['17a', '17e', '168', '165'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var copy = $__require('179'),
-	    map = $__require('17d'),
-	    callable = $__require('167'),
-	    validValue = $__require('164'),
+	var copy = $__require('17a'),
+	    map = $__require('17e'),
+	    callable = $__require('168'),
+	    validValue = $__require('165'),
 	    bind = Function.prototype.bind,
 	    defineProperty = Object.defineProperty,
 	    hasOwnProperty = Object.prototype.hasOwnProperty,
@@ -39267,19 +39267,19 @@ $__System.registerDynamic('17e', ['179', '17d', '167', '164'], true, function ($
 	};
 	return module.exports;
 });
-$__System.registerDynamic('169', ['178', '17a', '167', '164', '166', '17e', '170'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16a', ['179', '17b', '168', '165', '167', '17f', '171'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var clear = $__require('178'),
-	    assign = $__require('17a'),
-	    callable = $__require('167'),
-	    value = $__require('164'),
-	    d = $__require('166'),
-	    autoBind = $__require('17e'),
-	    Symbol = $__require('170'),
+	var clear = $__require('179'),
+	    assign = $__require('17b'),
+	    callable = $__require('168'),
+	    value = $__require('165'),
+	    d = $__require('167'),
+	    autoBind = $__require('17f'),
+	    Symbol = $__require('171'),
 	    defineProperty = Object.defineProperty,
 	    defineProperties = Object.defineProperties,
 	    Iterator;
@@ -39368,7 +39368,7 @@ $__System.registerDynamic('169', ['178', '17a', '167', '164', '166', '17e', '170
 	defineProperty(Iterator.prototype, Symbol.toStringTag, d('', 'Iterator'));
 	return module.exports;
 });
-$__System.registerDynamic('17f', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('180', [], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
@@ -39395,7 +39395,7 @@ $__System.registerDynamic('17f', [], true, function ($__require, exports, module
 	};
 	return module.exports;
 });
-$__System.registerDynamic('180', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('181', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39412,7 +39412,7 @@ $__System.registerDynamic('180', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('181', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('182', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39429,7 +39429,7 @@ $__System.registerDynamic('181', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('182', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('183', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39443,17 +39443,17 @@ $__System.registerDynamic('182', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('183', ['181', '182', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('184', ['182', '183', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('181')() ? Object.keys : $__require('182');
+	module.exports = $__require('182')() ? Object.keys : $__require('183');
 	return module.exports;
 });
-$__System.registerDynamic("164", ["5"], true, function ($__require, exports, module) {
+$__System.registerDynamic("165", ["5"], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require("5");
@@ -39466,15 +39466,15 @@ $__System.registerDynamic("164", ["5"], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('184', ['183', '164', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('185', ['184', '165', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var keys = $__require('183'),
-	    value = $__require('164'),
+	var keys = $__require('184'),
+	    value = $__require('165'),
 	    max = Math.max;
 
 	module.exports = function (dest, src /*, …srcn*/) {
@@ -39499,17 +39499,17 @@ $__System.registerDynamic('184', ['183', '164', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17a', ['180', '184', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17b', ['181', '185', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('180')() ? Object.assign : $__require('184');
+	module.exports = $__require('181')() ? Object.assign : $__require('185');
 	return module.exports;
 });
-$__System.registerDynamic('185', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('186', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39534,7 +39534,7 @@ $__System.registerDynamic('185', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('186', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('187', ['5'], true, function ($__require, exports, module) {
   // Deprecated
 
   'use strict';
@@ -39548,7 +39548,7 @@ $__System.registerDynamic('186', ['5'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic('187', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('188', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39563,7 +39563,7 @@ $__System.registerDynamic('187', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('188', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('189', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39577,26 +39577,26 @@ $__System.registerDynamic('188', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('16b', ['187', '188', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16c', ['188', '189', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('187')() ? String.prototype.contains : $__require('188');
+	module.exports = $__require('188')() ? String.prototype.contains : $__require('189');
 	return module.exports;
 });
-$__System.registerDynamic('166', ['17a', '185', '186', '16b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('167', ['17b', '186', '187', '16c'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var assign = $__require('17a'),
-	    normalizeOpts = $__require('185'),
-	    isCallable = $__require('186'),
-	    contains = $__require('16b'),
+	var assign = $__require('17b'),
+	    normalizeOpts = $__require('186'),
+	    isCallable = $__require('187'),
+	    contains = $__require('16c'),
 	    d;
 
 	d = module.exports = function (dscr, value /*, options*/) {
@@ -39655,7 +39655,7 @@ $__System.registerDynamic('166', ['17a', '185', '186', '16b'], true, function ($
 	};
 	return module.exports;
 });
-$__System.registerDynamic('189', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('18a', [], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
@@ -39670,13 +39670,13 @@ $__System.registerDynamic('189', [], true, function ($__require, exports, module
 	};
 	return module.exports;
 });
-$__System.registerDynamic('18a', ['189'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18b', ['18a'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isSymbol = $__require('189');
+	var isSymbol = $__require('18a');
 
 	module.exports = function (value) {
 		if (!isSymbol(value)) throw new TypeError(value + " is not a symbol");
@@ -39684,7 +39684,7 @@ $__System.registerDynamic('18a', ['189'], true, function ($__require, exports, m
 	};
 	return module.exports;
 });
-$__System.registerDynamic('18b', ['166', '18a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18c', ['167', '18b'], true, function ($__require, exports, module) {
 	// ES2015 Symbol polyfill for environments that do not support it (or partially support it)
 
 	'use strict';
@@ -39692,8 +39692,8 @@ $__System.registerDynamic('18b', ['166', '18a'], true, function ($__require, exp
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var d = $__require('166'),
-	    validateSymbol = $__require('18a'),
+	var d = $__require('167'),
+	    validateSymbol = $__require('18b'),
 	    create = Object.create,
 	    defineProperties = Object.defineProperties,
 	    defineProperty = Object.defineProperty,
@@ -39817,13 +39817,13 @@ $__System.registerDynamic('18b', ['166', '18a'], true, function ($__require, exp
 	defineProperty(HiddenSymbol.prototype, SymbolPolyfill.toPrimitive, d('c', SymbolPolyfill.prototype[SymbolPolyfill.toPrimitive]));
 	return module.exports;
 });
-$__System.registerDynamic('170', ['17f', '18b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('171', ['180', '18c'], true, function ($__require, exports, module) {
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require('17f')() ? Symbol : $__require('18b');
+  module.exports = $__require('180')() ? Symbol : $__require('18c');
   return module.exports;
 });
 $__System.registerDynamic("@system-env", [], false, function() {
@@ -39938,7 +39938,7 @@ $__System.registerDynamic('5', ['@system-env'], true, function ($__require, expo
     };
     return module.exports;
 });
-$__System.registerDynamic('18c', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18d', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39957,26 +39957,26 @@ $__System.registerDynamic('18c', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('18d', ['18c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18e', ['18d'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('18c')('key', 'value', 'key+value');
+	module.exports = $__require('18d')('key', 'value', 'key+value');
 	return module.exports;
 });
-$__System.registerDynamic('18e', ['16a', '166', '169', '170', '18d'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18f', ['16b', '167', '16a', '171', '18e'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var setPrototypeOf = $__require('16a'),
-	    d = $__require('166'),
-	    Iterator = $__require('169'),
-	    toStringTagSymbol = $__require('170').toStringTag,
-	    kinds = $__require('18d'),
+	var setPrototypeOf = $__require('16b'),
+	    d = $__require('167'),
+	    Iterator = $__require('16a'),
+	    toStringTagSymbol = $__require('171').toStringTag,
+	    kinds = $__require('18e'),
 	    defineProperties = Object.defineProperties,
 	    unBind = Iterator.prototype._unBind,
 	    MapIterator;
@@ -40010,7 +40010,7 @@ $__System.registerDynamic('18e', ['16a', '166', '169', '170', '18d'], true, func
 	Object.defineProperty(MapIterator.prototype, toStringTagSymbol, d('c', 'Map Iterator'));
 	return module.exports;
 });
-$__System.registerDynamic('18f', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('190', [], true, function ($__require, exports, module) {
 	// Exports true if environment provides native `Map` implementation,
 	// whatever that is.
 
@@ -40025,24 +40025,24 @@ $__System.registerDynamic('18f', [], true, function ($__require, exports, module
 	}();
 	return module.exports;
 });
-$__System.registerDynamic('190', ['178', '163', '16a', '167', '164', '166', '165', '170', '171', '173', '18e', '18f'], true, function ($__require, exports, module) {
+$__System.registerDynamic('191', ['179', '164', '16b', '168', '165', '167', '166', '171', '172', '174', '18f', '190'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var clear = $__require('178'),
-	    eIndexOf = $__require('163'),
-	    setPrototypeOf = $__require('16a'),
-	    callable = $__require('167'),
-	    validValue = $__require('164'),
-	    d = $__require('166'),
-	    ee = $__require('165'),
-	    Symbol = $__require('170'),
-	    iterator = $__require('171'),
-	    forOf = $__require('173'),
-	    Iterator = $__require('18e'),
-	    isNative = $__require('18f'),
+	var clear = $__require('179'),
+	    eIndexOf = $__require('164'),
+	    setPrototypeOf = $__require('16b'),
+	    callable = $__require('168'),
+	    validValue = $__require('165'),
+	    d = $__require('167'),
+	    ee = $__require('166'),
+	    Symbol = $__require('171'),
+	    iterator = $__require('172'),
+	    forOf = $__require('174'),
+	    Iterator = $__require('18f'),
+	    isNative = $__require('190'),
 	    call = Function.prototype.call,
 	    defineProperties = Object.defineProperties,
 	    getPrototypeOf = Object.getPrototypeOf,
@@ -40150,13 +40150,13 @@ $__System.registerDynamic('190', ['178', '163', '16a', '167', '164', '166', '165
 	Object.defineProperty(MapPoly.prototype, Symbol.toStringTag, d('c', 'Map'));
 	return module.exports;
 });
-$__System.registerDynamic('191', ['15d', '190'], true, function ($__require, exports, module) {
+$__System.registerDynamic('192', ['15e', '191'], true, function ($__require, exports, module) {
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require('15d')() ? Map : $__require('190');
+  module.exports = $__require('15e')() ? Map : $__require('191');
   return module.exports;
 });
 (function() {
@@ -40326,14 +40326,14 @@ define("141", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("15b", ["require", "exports", "module", "146", "139", "192", "193", "194", "195", "15a", "13a", "141"], function(require, exports, module) {
-  var OptionsManager = require('146');
+define("15c", ["require", "exports", "module", "148", "139", "193", "194", "195", "196", "15b", "13a", "141"], function(require, exports, module) {
+  var OptionsManager = require('148');
   var Transform = require('139');
-  var Vector = require('192');
-  var Particle = require('193');
-  var Spring = require('194');
-  var PhysicsEngine = require('195');
-  var LayoutNode = require('15a');
+  var Vector = require('193');
+  var Particle = require('194');
+  var Spring = require('195');
+  var PhysicsEngine = require('196');
+  var LayoutNode = require('15b');
   var Transitionable = require('13a');
   var Easing = require('141');
   function FlowLayoutNode(renderNode, spec) {
@@ -40848,9 +40848,9 @@ define("15b", ["require", "exports", "module", "146", "139", "192", "193", "194"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("15a", ["require", "exports", "module", "139", "156"], function(require, exports, module) {
+define("15b", ["require", "exports", "module", "139", "157"], function(require, exports, module) {
   var Transform = require('139');
-  var LayoutUtility = require('156');
+  var LayoutUtility = require('157');
   function LayoutNode(renderNode, spec) {
     this.renderNode = renderNode;
     this._spec = spec ? LayoutUtility.cloneSpec(spec) : {};
@@ -40976,14 +40976,14 @@ define("15a", ["require", "exports", "module", "139", "156"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("159", ["require", "exports", "module", "15c", "191", "156", "149", "13f", "15b", "15a"], function(require, exports, module) {
-  var LayoutContext = require('15c');
-  var Map = require('191');
-  var LayoutUtility = require('156');
-  var Surface = require('149');
+define("15a", ["require", "exports", "module", "15d", "192", "157", "146", "13f", "15c", "15b"], function(require, exports, module) {
+  var LayoutContext = require('15d');
+  var Map = require('192');
+  var LayoutUtility = require('157');
+  var Surface = require('146');
   var RenderNode = require('13f');
-  var FlowLayoutNode = require('15b');
-  var LayoutNode = require('15a');
+  var FlowLayoutNode = require('15c');
+  var LayoutNode = require('15b');
   var MAX_POOL_SIZE = 100;
   function LayoutNodeManager(LayoutNode, initLayoutNodeFn, partialFlow) {
     this.LayoutNode = LayoutNode;
@@ -41508,9 +41508,9 @@ define("159", ["require", "exports", "module", "15c", "191", "156", "149", "13f"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("196", ["require", "exports", "module", "149", "151"], function(require, exports, module) {
-  var Surface = require('149');
-  var Context = require('151');
+define("197", ["require", "exports", "module", "146", "152"], function(require, exports, module) {
+  var Surface = require('146');
+  var Context = require('152');
   function ContainerSurface(options) {
     Surface.call(this, options);
     this._container = document.createElement('div');
@@ -41552,9 +41552,9 @@ define("196", ["require", "exports", "module", "149", "151"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("197", ["require", "exports", "module", "157", "145", "139"], function(require, exports, module) {
-  var Entity = require('157');
-  var EventHandler = require('145');
+define("198", ["require", "exports", "module", "158", "147", "139"], function(require, exports, module) {
+  var Entity = require('158');
+  var EventHandler = require('147');
   var Transform = require('139');
   var usePrefix = !('transform' in document.documentElement.style);
   var devicePixelRatio = window.devicePixelRatio || 1;
@@ -41726,8 +41726,8 @@ define("197", ["require", "exports", "module", "157", "145", "139"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("149", ["require", "exports", "module", "197"], function(require, exports, module) {
-  var ElementOutput = require('197');
+define("146", ["require", "exports", "module", "198"], function(require, exports, module) {
+  var ElementOutput = require('198');
   function Surface(options) {
     ElementOutput.call(this);
     this.options = {};
@@ -42031,10 +42031,10 @@ define("149", ["require", "exports", "module", "197"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("198", ["require", "exports", "module", "151", "139", "149"], function(require, exports, module) {
-  var Context = require('151');
+define("199", ["require", "exports", "module", "152", "139", "146"], function(require, exports, module) {
+  var Context = require('152');
   var Transform = require('139');
-  var Surface = require('149');
+  var Surface = require('146');
   function Group(options) {
     Surface.call(this, options);
     this._shouldRecalculateSize = false;
@@ -42090,8 +42090,8 @@ define("198", ["require", "exports", "module", "151", "139", "149"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("195", ["require", "exports", "module", "145"], function(require, exports, module) {
-  var EventHandler = require('145');
+define("196", ["require", "exports", "module", "147"], function(require, exports, module) {
+  var EventHandler = require('147');
   function PhysicsEngine(options) {
     this.options = Object.create(PhysicsEngine.DEFAULT_OPTIONS);
     if (options)
@@ -42365,7 +42365,7 @@ define("195", ["require", "exports", "module", "145"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("199", ["require", "exports", "module"], function(require, exports, module) {
+define("19a", ["require", "exports", "module"], function(require, exports, module) {
   var SymplecticEuler = {};
   SymplecticEuler.integrateVelocity = function integrateVelocity(body, dt) {
     var v = body.velocity;
@@ -42402,11 +42402,11 @@ define("199", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("193", ["require", "exports", "module", "192", "139", "145", "199"], function(require, exports, module) {
-  var Vector = require('192');
+define("194", ["require", "exports", "module", "193", "139", "147", "19a"], function(require, exports, module) {
+  var Vector = require('193');
   var Transform = require('139');
-  var EventHandler = require('145');
-  var Integrator = require('199');
+  var EventHandler = require('147');
+  var Integrator = require('19a');
   function Particle(options) {
     options = options || {};
     var defaults = Particle.DEFAULT_OPTIONS;
@@ -42578,8 +42578,8 @@ define("193", ["require", "exports", "module", "192", "139", "145", "199"], func
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19a", ["require", "exports", "module", "19b"], function(require, exports, module) {
-  var Force = require('19b');
+define("19b", ["require", "exports", "module", "19c"], function(require, exports, module) {
+  var Force = require('19c');
   function Drag(options) {
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
     if (options)
@@ -42622,9 +42622,9 @@ define("19a", ["require", "exports", "module", "19b"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19b", ["require", "exports", "module", "192", "145"], function(require, exports, module) {
-  var Vector = require('192');
-  var EventHandler = require('145');
+define("19c", ["require", "exports", "module", "193", "147"], function(require, exports, module) {
+  var Vector = require('193');
+  var EventHandler = require('147');
   function Force(force) {
     this.force = new Vector(force);
     this._eventOutput = new EventHandler();
@@ -42648,7 +42648,7 @@ define("19b", ["require", "exports", "module", "192", "145"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("192", ["require", "exports", "module"], function(require, exports, module) {
+define("193", ["require", "exports", "module"], function(require, exports, module) {
   function Vector(x, y, z) {
     if (arguments.length === 1 && x !== undefined)
       this.set(x);
@@ -42797,9 +42797,9 @@ define("192", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("194", ["require", "exports", "module", "19b", "192"], function(require, exports, module) {
-  var Force = require('19b');
-  var Vector = require('192');
+define("195", ["require", "exports", "module", "19c", "193"], function(require, exports, module) {
+  var Force = require('19c');
+  var Vector = require('193');
   function Spring(options) {
     Force.call(this);
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
@@ -42926,7 +42926,7 @@ define("194", ["require", "exports", "module", "19b", "192"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("157", ["require", "exports", "module"], function(require, exports, module) {
+define("158", ["require", "exports", "module"], function(require, exports, module) {
   var entities = [];
   function get(id) {
     return entities[id];
@@ -42953,7 +42953,7 @@ define("157", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19c", ["require", "exports", "module", "139"], function(require, exports, module) {
+define("19d", ["require", "exports", "module", "139"], function(require, exports, module) {
   var Transform = require('139');
   function SpecParser() {
     this.result = {};
@@ -43061,9 +43061,9 @@ define("19c", ["require", "exports", "module", "139"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13f", ["require", "exports", "module", "157", "19c"], function(require, exports, module) {
-  var Entity = require('157');
-  var SpecParser = require('19c');
+define("13f", ["require", "exports", "module", "158", "19d"], function(require, exports, module) {
+  var Entity = require('158');
+  var SpecParser = require('19d');
   function RenderNode(object) {
     this._object = null;
     this._child = null;
@@ -43161,7 +43161,7 @@ define("13f", ["require", "exports", "module", "157", "19c"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19d", ["require", "exports", "module"], function(require, exports, module) {
+define("19e", ["require", "exports", "module"], function(require, exports, module) {
   function ElementAllocator(container) {
     if (!container)
       container = document.createDocumentFragment();
@@ -43475,8 +43475,8 @@ define("139", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19e", ["require", "exports", "module", "147"], function(require, exports, module) {
-  var Utility = require('147');
+define("19f", ["require", "exports", "module", "149"], function(require, exports, module) {
+  var Utility = require('149');
   function MultipleTransition(method) {
     this.method = method;
     this._instances = [];
@@ -43510,7 +43510,7 @@ define("19e", ["require", "exports", "module", "147"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19f", ["require", "exports", "module"], function(require, exports, module) {
+define("1a0", ["require", "exports", "module"], function(require, exports, module) {
   function TweenTransition(options) {
     this.options = Object.create(TweenTransition.DEFAULT_OPTIONS);
     if (options)
@@ -43754,9 +43754,9 @@ define("19f", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13a", ["require", "exports", "module", "19e", "19f"], function(require, exports, module) {
-  var MultipleTransition = require('19e');
-  var TweenTransition = require('19f');
+define("13a", ["require", "exports", "module", "19f", "1a0"], function(require, exports, module) {
+  var MultipleTransition = require('19f');
+  var TweenTransition = require('1a0');
   function Transitionable(start) {
     this.currentAction = null;
     this.actionQueue = [];
@@ -43885,10 +43885,10 @@ define("13a", ["require", "exports", "module", "19e", "19f"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("151", ["require", "exports", "module", "13f", "145", "19d", "139", "13a"], function(require, exports, module) {
+define("152", ["require", "exports", "module", "13f", "147", "19e", "139", "13a"], function(require, exports, module) {
   var RenderNode = require('13f');
-  var EventHandler = require('145');
-  var ElementAllocator = require('19d');
+  var EventHandler = require('147');
+  var ElementAllocator = require('19e');
   var Transform = require('139');
   var Transitionable = require('13a');
   var _zeroZero = [0, 0];
@@ -43990,10 +43990,10 @@ define("151", ["require", "exports", "module", "13f", "145", "19d", "139", "13a"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("152", ["require", "exports", "module", "151", "145", "146"], function(require, exports, module) {
-  var Context = require('151');
-  var EventHandler = require('145');
-  var OptionsManager = require('146');
+define("153", ["require", "exports", "module", "152", "147", "148"], function(require, exports, module) {
+  var Context = require('152');
+  var EventHandler = require('147');
+  var OptionsManager = require('148');
   var Engine = {};
   var contexts = [];
   var nextTickQueue = [];
@@ -44171,7 +44171,7 @@ define("152", ["require", "exports", "module", "151", "145", "146"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a0", ["require", "exports", "module"], function(require, exports, module) {
+define("1a1", ["require", "exports", "module"], function(require, exports, module) {
   function EventEmitter() {
     this.listeners = {};
     this._owner = this;
@@ -44223,8 +44223,8 @@ define("1a0", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("145", ["require", "exports", "module", "1a0"], function(require, exports, module) {
-  var EventEmitter = require('1a0');
+define("147", ["require", "exports", "module", "1a1"], function(require, exports, module) {
+  var EventEmitter = require('1a1');
   function EventHandler() {
     EventEmitter.apply(this, arguments);
     this.downstream = [];
@@ -44334,8 +44334,8 @@ define("145", ["require", "exports", "module", "1a0"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("146", ["require", "exports", "module", "145"], function(require, exports, module) {
-  var EventHandler = require('145');
+define("148", ["require", "exports", "module", "147"], function(require, exports, module) {
+  var EventHandler = require('147');
   function OptionsManager(value) {
     this._value = value;
     this.eventOutput = null;
@@ -44414,10 +44414,10 @@ define("146", ["require", "exports", "module", "145"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a1", ["require", "exports", "module", "145", "152", "146"], function(require, exports, module) {
-  var EventHandler = require('145');
-  var Engine = require('152');
-  var OptionsManager = require('146');
+define("1a2", ["require", "exports", "module", "147", "153", "148"], function(require, exports, module) {
+  var EventHandler = require('147');
+  var Engine = require('153');
+  var OptionsManager = require('148');
   function ScrollSync(options) {
     this.options = Object.create(ScrollSync.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
@@ -44539,7 +44539,7 @@ define("1a1", ["require", "exports", "module", "145", "152", "146"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("158", ["require", "exports", "module"], function(require, exports, module) {
+define("159", ["require", "exports", "module"], function(require, exports, module) {
   function assert(value, message) {
     if (!value) {
       throw new Error(message);
@@ -44754,23 +44754,23 @@ define("158", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a2", ["require", "exports", "module", "156", "13e", "15a", "15b", "159", "196", "139", "145", "198", "192", "195", "193", "19a", "194", "1a1", "158"], function(require, exports, module) {
-  var LayoutUtility = require('156');
+define("1a3", ["require", "exports", "module", "157", "13e", "15b", "15c", "15a", "197", "139", "147", "199", "193", "196", "194", "19b", "195", "1a2", "159"], function(require, exports, module) {
+  var LayoutUtility = require('157');
   var LayoutController = require('13e');
-  var LayoutNode = require('15a');
-  var FlowLayoutNode = require('15b');
-  var LayoutNodeManager = require('159');
-  var ContainerSurface = require('196');
+  var LayoutNode = require('15b');
+  var FlowLayoutNode = require('15c');
+  var LayoutNodeManager = require('15a');
+  var ContainerSurface = require('197');
   var Transform = require('139');
-  var EventHandler = require('145');
-  var Group = require('198');
-  var Vector = require('192');
-  var PhysicsEngine = require('195');
-  var Particle = require('193');
-  var Drag = require('19a');
-  var Spring = require('194');
-  var ScrollSync = require('1a1');
-  var LinkedListViewSequence = require('158');
+  var EventHandler = require('147');
+  var Group = require('199');
+  var Vector = require('193');
+  var PhysicsEngine = require('196');
+  var Particle = require('194');
+  var Drag = require('19b');
+  var Spring = require('195');
+  var ScrollSync = require('1a2');
+  var LinkedListViewSequence = require('159');
   var Bounds = {
     NONE: 0,
     PREV: 1,
@@ -46096,7 +46096,7 @@ define("1a2", ["require", "exports", "module", "156", "13e", "15a", "15b", "159"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("147", ["require", "exports", "module"], function(require, exports, module) {
+define("149", ["require", "exports", "module"], function(require, exports, module) {
   var Utility = {};
   Utility.Direction = {
     X: 0,
@@ -46159,8 +46159,8 @@ define("147", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("156", ["require", "exports", "module", "147"], function(require, exports, module) {
-  var Utility = require('147');
+define("157", ["require", "exports", "module", "149"], function(require, exports, module) {
+  var Utility = require('149');
   function LayoutUtility() {}
   LayoutUtility.registeredHelpers = {};
   var Capabilities = {
@@ -46313,9 +46313,9 @@ define("156", ["require", "exports", "module", "147"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a3", ["require", "exports", "module", "147", "156"], function(require, exports, module) {
-  var Utility = require('147');
-  var LayoutUtility = require('156');
+define("1a4", ["require", "exports", "module", "149", "157"], function(require, exports, module) {
+  var Utility = require('149');
+  var LayoutUtility = require('157');
   var capabilities = {
     sequence: true,
     direction: [Utility.Direction.Y, Utility.Direction.X],
@@ -46486,10 +46486,10 @@ define("1a3", ["require", "exports", "module", "147", "156"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a4", ["require", "exports", "module", "156", "1a2", "1a3"], function(require, exports, module) {
-  var LayoutUtility = require('156');
-  var ScrollController = require('1a2');
-  var ListLayout = require('1a3');
+define("1a5", ["require", "exports", "module", "157", "1a3", "1a4"], function(require, exports, module) {
+  var LayoutUtility = require('157');
+  var ScrollController = require('1a3');
+  var ListLayout = require('1a4');
   var PullToRefreshState = {
     HIDDEN: 0,
     PULLING: 1,
@@ -46884,10 +46884,10 @@ define("1a4", ["require", "exports", "module", "156", "1a2", "1a3"], function(re
 });
 
 })();
-$__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '197', '134', '135', '136', '152', '151', '13c', '143', '141', '144', '142', '12c', '12d', '149', '13d', '13e', '148', '156', '14a', '13a', '14c', '150', '139', '140', '14d', '14e', '14f', '13f', '138', '1a4', '1a5'], function (_export, _context3) {
+$__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '198', '134', '135', '136', '153', '152', '13c', '143', '141', '144', '142', '12c', '12d', '146', '13d', '13e', '14a', '157', '14b', '13a', '14d', '151', '139', '140', '14e', '14f', '150', '13f', '138', '1a5', '145'], function (_export, _context3) {
     "use strict";
 
-    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, HomeView, HomeController, _class, _temp, App$$1;
+    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, HomeView, HomeController, _class, _temp, App$$1;
 
     // A bunch of helper functions.
 
@@ -47490,36 +47490,36 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
             FamousView = _d3.default;
         }, function (_e3) {
             LayoutController = _e3.default;
-        }, function (_17) {
-            ImageSurface = _17.default;
-        }, function (_18) {
-            LayoutUtility = _18.default;
         }, function (_a2) {
-            OrderedHashMap = _a2.default;
+            ImageSurface = _a2.default;
+        }, function (_17) {
+            LayoutUtility = _17.default;
+        }, function (_b2) {
+            OrderedHashMap = _b2.default;
         }, function (_a3) {
             Transitionable = _a3.default;
-        }, function (_c3) {
-            Draggable = _c3.default;
-        }, function (_19) {
-            ContainerSurface = _19.default;
-        }, function (_20) {
-            Transform = _20.default;
-        }, function (_21) {
-            Timer = _21.default;
         }, function (_d4) {
-            GenericSync = _d4.default;
+            Draggable = _d4.default;
+        }, function (_18) {
+            ContainerSurface = _18.default;
+        }, function (_19) {
+            Transform = _19.default;
+        }, function (_20) {
+            Timer = _20.default;
         }, function (_e4) {
-            MouseSync = _e4.default;
+            GenericSync = _e4.default;
         }, function (_f2) {
-            TouchSync = _f2.default;
+            MouseSync = _f2.default;
+        }, function (_21) {
+            TouchSync = _21.default;
         }, function (_f3) {
             RenderNode = _f3.default;
         }, function (_22) {
             Modifier = _22.default;
         }, function (_a4) {
             FlexScrollView = _a4.default;
-        }, function (_a5) {
-            InputSurface = _a5.default;
+        }, function (_23) {
+            InputSurface = _23.default;
         }],
         execute: function () {
             _classCallCheck = function (instance, Constructor) {
@@ -55424,7 +55424,7 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
             HomeView = (_dec$4 = layout$1.size(1000, 100), _dec2$1 = layout$1.fullSize(), _dec3 = layout$1.stick.top(), _dec4 = layout$1.animate({
                 animation: AnimationController.Animation.FadedZoom,
                 transition: { duration: 1000 }
-            }), _dec5 = layout$1.translate(0, 0, -10), _dec6 = layout$1.fullSize(), _dec7 = layout$1.size(500, 50), _dec8 = layout$1.dock.bottom(), _dec9 = layout$1.stick.center(), _dec10 = layout$1.size(500, 100), _dec11 = layout$1.dock.bottom(), _dec12 = layout$1.stick.center(), (_class$6 = function (_View) {
+            }), _dec5 = layout$1.translate(0, 0, -10), _dec6 = layout$1.fullSize(), _dec7 = layout$1.size(500, 50), _dec8 = layout$1.dock.bottom(), _dec9 = layout$1.stick.center(), _dec10 = layout$1.size(500, 100), _dec11 = layout$1.dock.bottom(), _dec12 = layout$1.stick.center(), _dec13 = layout$1.size(100, 100), _dec14 = layout$1.dock.bottom(), _dec15 = layout$1.stick.right(), (_class$6 = function (_View) {
                 _inherits(HomeView, _View);
 
                 function HomeView() {
@@ -55441,6 +55441,8 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     _initDefineProp(_this, 'footer', _descriptor3, _this);
 
                     _initDefineProp(_this, 'chatmessage', _descriptor4, _this);
+
+                    _initDefineProp(_this, 'sendbutton', _descriptor5, _this);
 
                     return _this;
                 }
@@ -55473,6 +55475,19 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                 initializer: function initializer() {
                     return new InputSurface({
                         placeholder: '... ... ...',
+                        properties: {
+                            textAlign: 'center',
+                            color: 'black',
+                            padding: '20px'
+                        }
+                    });
+                }
+            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec13, _dec14, _dec15], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new InputSurface({
+                        value: 'Send',
+                        type: 'button',
                         properties: {
                             textAlign: 'center',
                             color: 'black',
