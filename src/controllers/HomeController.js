@@ -4,7 +4,7 @@ import {HomeView}                   from '../views/HomeView.js';
 export class HomeController extends Controller {
     Index(){
         if(!this.homeView) {
-            this.homeView = new HomeView({welcomeName: 'world'});
+            this.homeView = new HomeView({});
         }
         return this.homeView;
     }

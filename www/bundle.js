@@ -35872,6 +35872,77 @@ $__System.register("144", [], function() { return { setters: [], execute: functi
 
 (function() {
 var define = $__System.amdDefine;
+define("1a5", ["require", "exports", "module", "149"], function(require, exports, module) {
+  var Surface = require('149');
+  function InputSurface(options) {
+    this._placeholder = options.placeholder || '';
+    this._value = options.value || '';
+    this._type = options.type || 'text';
+    this._name = options.name || '';
+    Surface.apply(this, arguments);
+    this.on('click', this.focus.bind(this));
+    window.addEventListener('click', function(event) {
+      if (event.target !== this._currentTarget)
+        this.blur();
+    }.bind(this));
+  }
+  InputSurface.prototype = Object.create(Surface.prototype);
+  InputSurface.prototype.constructor = InputSurface;
+  InputSurface.prototype.elementType = 'input';
+  InputSurface.prototype.elementClass = 'famous-surface';
+  InputSurface.prototype.setPlaceholder = function setPlaceholder(str) {
+    this._placeholder = str;
+    this._contentDirty = true;
+    return this;
+  };
+  InputSurface.prototype.focus = function focus() {
+    if (this._currentTarget)
+      this._currentTarget.focus();
+    return this;
+  };
+  InputSurface.prototype.blur = function blur() {
+    if (this._currentTarget)
+      this._currentTarget.blur();
+    return this;
+  };
+  InputSurface.prototype.setValue = function setValue(str) {
+    this._value = str;
+    this._contentDirty = true;
+    return this;
+  };
+  InputSurface.prototype.setType = function setType(str) {
+    this._type = str;
+    this._contentDirty = true;
+    return this;
+  };
+  InputSurface.prototype.getValue = function getValue() {
+    if (this._currentTarget) {
+      return this._currentTarget.value;
+    } else {
+      return this._value;
+    }
+  };
+  InputSurface.prototype.setName = function setName(str) {
+    this._name = str;
+    this._contentDirty = true;
+    return this;
+  };
+  InputSurface.prototype.getName = function getName() {
+    return this._name;
+  };
+  InputSurface.prototype.deploy = function deploy(target) {
+    if (this._placeholder !== '')
+      target.placeholder = this._placeholder;
+    target.value = this._value;
+    target.type = this._type;
+    target.name = this._name;
+  };
+  module.exports = InputSurface;
+});
+
+})();
+(function() {
+var define = $__System.amdDefine;
 define("13d", ["require", "exports", "module", "145", "146", "13f", "147"], function(require, exports, module) {
   var EventHandler = require('145');
   var OptionsManager = require('146');
@@ -46813,10 +46884,10 @@ define("1a4", ["require", "exports", "module", "156", "1a2", "1a3"], function(re
 });
 
 })();
-$__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '197', '134', '135', '136', '152', '151', '13c', '143', '141', '144', '142', '12c', '12d', '149', '13d', '13e', '148', '156', '14a', '13a', '14c', '150', '139', '140', '14d', '14e', '14f', '13f', '138', '1a4'], function (_export, _context3) {
+$__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '197', '134', '135', '136', '152', '151', '13c', '143', '141', '144', '142', '12c', '12d', '149', '13d', '13e', '148', '156', '14a', '13a', '14c', '150', '139', '140', '14d', '14e', '14f', '13f', '138', '1a4', '1a5'], function (_export, _context3) {
     "use strict";
 
-    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, flow, _dec$4, _dec2$1, _class$6, _descriptor, HomeView, HomeController, _class, _temp, App$$1;
+    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, HomeView, HomeController, _class, _temp, App$$1;
 
     // A bunch of helper functions.
 
@@ -47447,6 +47518,8 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
             Modifier = _22.default;
         }, function (_a4) {
             FlexScrollView = _a4.default;
+        }, function (_a5) {
+            InputSurface = _a5.default;
         }],
         execute: function () {
             _classCallCheck = function (instance, Constructor) {
@@ -55348,7 +55421,10 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     };
                 }
             };
-            HomeView = (_dec$4 = layout$1.size(~100, ~25), _dec2$1 = layout$1.stick.center(), (_class$6 = function (_View) {
+            HomeView = (_dec$4 = layout$1.size(1000, 100), _dec2$1 = layout$1.fullSize(), _dec3 = layout$1.stick.top(), _dec4 = layout$1.animate({
+                animation: AnimationController.Animation.FadedZoom,
+                transition: { duration: 1000 }
+            }), _dec5 = layout$1.translate(0, 0, -10), _dec6 = layout$1.fullSize(), _dec7 = layout$1.size(500, 50), _dec8 = layout$1.dock.bottom(), _dec9 = layout$1.stick.center(), _dec10 = layout$1.size(500, 100), _dec11 = layout$1.dock.bottom(), _dec12 = layout$1.stick.center(), (_class$6 = function (_View) {
                 _inherits(HomeView, _View);
 
                 function HomeView() {
@@ -55360,16 +55436,51 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
 
                     _initDefineProp(_this, 'message', _descriptor, _this);
 
+                    _initDefineProp(_this, 'background', _descriptor2, _this);
+
+                    _initDefineProp(_this, 'footer', _descriptor3, _this);
+
+                    _initDefineProp(_this, 'chatmessage', _descriptor4, _this);
+
                     return _this;
                 }
 
                 return HomeView;
-            }(View), _descriptor = _applyDecoratedDescriptor(_class$6.prototype, 'message', [_dec$4, _dec2$1], {
+            }(View), (_descriptor = _applyDecoratedDescriptor(_class$6.prototype, 'message', [_dec$4, _dec2$1, _dec3, _dec4], {
                 enumerable: true,
                 initializer: function initializer() {
-                    return new Surface({ content: 'Hello ' + this.options.welcomeName });
+                    return new Surface({
+                        content: 'Welcome to Arva Chat App',
+                        properties: {
+                            textAlign: 'center',
+                            color: 'gray',
+                            size: '100%'
+                        }
+                    });
                 }
-            }), _class$6));
+            }), _descriptor2 = _applyDecoratedDescriptor(_class$6.prototype, 'background', [_dec5, _dec6], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface({ properties: { backgroundColor: 'pink' } });
+                }
+            }), _descriptor3 = _applyDecoratedDescriptor(_class$6.prototype, 'footer', [_dec7, _dec8, _dec9], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface({});
+                }
+            }), _descriptor4 = _applyDecoratedDescriptor(_class$6.prototype, 'chatmessage', [_dec10, _dec11, _dec12], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new InputSurface({
+                        placeholder: '... ... ...',
+                        properties: {
+                            textAlign: 'center',
+                            color: 'black',
+                            padding: '20px'
+                        }
+                    });
+                }
+            })), _class$6));
 
             HomeController = function (_Controller) {
                 _inherits(HomeController, _Controller);
@@ -55384,7 +55495,7 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     key: 'Index',
                     value: function Index() {
                         if (!this.homeView) {
-                            this.homeView = new HomeView({ welcomeName: 'world' });
+                            this.homeView = new HomeView({});
                         }
                         return this.homeView;
                     }
