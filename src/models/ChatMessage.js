@@ -1,5 +1,5 @@
 import {Model}                      from 'arva-js/core/Model.js';
 
-export class Chatmessage extends Model {
+export class ChatMessage extends Model {
     get leMessage() {}
 }

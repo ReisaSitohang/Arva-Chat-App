@@ -46887,7 +46887,7 @@ define("1a5", ["require", "exports", "module", "157", "1a3", "1a4"], function(re
 $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '198', '134', '135', '136', '153', '152', '13c', '143', '141', '144', '142', '12c', '12d', '146', '13d', '13e', '14a', '157', '14b', '13a', '14d', '151', '139', '140', '14e', '14f', '150', '13f', '138', '1a5', '145'], function (_export, _context3) {
     "use strict";
 
-    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, event, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _dec22, _dec23, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, HomeView, HomeController, _class, _temp, App$$1;
+    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, HomeView, PrioritisedArray, _get, PrioritisedObject, Model, ChatMessage, ChatMessages, HomeController, _class, _temp, App$$1;
 
     // A bunch of helper functions.
 
@@ -47458,6 +47458,39 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
 
         return desc;
     }
+
+    function _extendableBuiltin(cls) {
+        function ExtendableBuiltin() {
+            cls.apply(this, arguments);
+        }
+
+        ExtendableBuiltin.prototype = Object.create(cls.prototype, {
+            constructor: {
+                value: cls,
+                enumerable: false,
+                writable: true,
+                configurable: true
+            }
+        });
+
+        if (Object.setPrototypeOf) {
+            Object.setPrototypeOf(ExtendableBuiltin, cls);
+        } else {
+            ExtendableBuiltin.__proto__ = cls;
+        }
+
+        return ExtendableBuiltin;
+    }
+
+    /**
+    
+    
+    
+     @author: Tom Clement (tjclement)
+     @license NPOSL-3.0
+     @copyright Bizboard, 2015
+    
+     */
 
     return {
         setters: [function (_a) {}, function (_b) {
@@ -55321,88 +55354,6 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     };
                 }
             };
-            event = {
-                /**
-                 * Internal function used by the event decorators to generalize the idea of on, once, and off
-                 * @param {String} subscriptionType A type of subscription function, e.g. on
-                 * @param {String} eventName The event name
-                 * @param {Function} callback that is called when event has happened
-                 * @returns {Function}
-                 */
-                _subscribe: function _subscribe(subscriptionType, eventName, callback) {
-                    return function (view, renderableName, descriptor) {
-                        var renderable = prepDecoratedRenderable(view, renderableName, descriptor);
-                        if (!renderable.decorations.eventSubscriptions) {
-                            renderable.decorations.eventSubscriptions = [];
-                        }
-                        renderable.decorations.eventSubscriptions.push({
-                            subscriptionType: subscriptionType,
-                            eventName: eventName,
-                            callback: callback
-                        });
-                    };
-                },
-
-                /**
-                 * @example
-                 * @layout.on('click', function() {this._handleClick})
-                 * thing = new Surface({properties: {backgroundColor: 'red'}});
-                 *
-                 * _handleClick() { ... }
-                 *
-                 * Adds an event listener to the renderable when specific event happened
-                 *
-                 * @param eventName
-                 * @param callback
-                 * @returns {Function} A decorator function
-                 */
-                on: function on(eventName, callback) {
-                    return event._subscribe('on', eventName, callback);
-                },
-
-                /**
-                 * @example
-                 * @layout.size(100,100)
-                 * @layout.stick.center()
-                 * @layout.once('click', function() {this._handleClick})
-                 * thing = new Surface({properties: {backgroundColor: 'red'}});
-                 *
-                 * _handleClick() { ... }
-                 *
-                 * Adds an event listener to the renderable when specific event happened once
-                 *
-                 * @param eventName
-                 * @param callback
-                 * @returns {Function} A decorator function
-                 */
-                once: function once(eventName, callback) {
-                    return event._subscribe('once', eventName, callback);
-                },
-
-                /**
-                 * @example
-                 * @layout.fullSize()
-                 * @layout.pipe('dbsv')
-                 * //Pipe events to another renderable declared above, called 'dbsv'
-                 * scrollableSurface = new Surface();
-                 *
-                 * Pipes events from one renderable to another. The other renderable has to be declared above the one that is doing
-                 * the piping, otherwise an exception will be thrown.
-                 *
-                 * @param pipeToName
-                 * @returns {Function}
-                 */
-                pipe: function pipe(pipeToName) {
-                    return function (view, renderableName, descriptor) {
-                        var renderable = prepDecoratedRenderable(view, renderableName, descriptor);
-                        if (!renderable.decorations.pipes) {
-                            renderable.decorations.pipes = [];
-                        }
-
-                        renderable.decorations.pipes.push(pipeToName);
-                    };
-                }
-            };
             flow = {
                 defaultOptions: function defaultOptions() {
                     var flowOptions = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -55506,17 +55457,11 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
             HomeView = (_dec$4 = layout$1.size(1000, 100), _dec2$1 = layout$1.stick.top(), _dec3 = layout$1.animate({
                 animation: AnimationController.Animation.FadedZoom,
                 transition: { duration: 1000 }
-            }), _dec4 = layout$1.translate(0, 0, -10), _dec5 = layout$1.fullSize(), _dec6 = layout$1.translate(0, 0, -5), _dec7 = layout$1.size(500, 500), _dec8 = layout$1.stick.center(), _dec9 = layout$1.size(500, 50), _dec10 = layout$1.dock.bottom(), _dec11 = layout$1.stick.center(), _dec12 = layout$1.size(500, 50), _dec13 = layout$1.dock.bottom(), _dec14 = layout$1.stick.center(), _dec15 = event.on('click', function () {
-                this.showRenderable('submitedmessage');
-            }), _dec16 = layout$1.size(500, 500), _dec17 = layout$1.stick.center(), _dec18 = layout$1.animate({
+            }), _dec4 = layout$1.translate(0, 0, -10), _dec5 = layout$1.fullSize(), _dec6 = layout$1.translate(0, 0, -5), _dec7 = layout$1.size(500, 500), _dec8 = layout$1.stick.center(), _dec9 = layout$1.size(500, 50), _dec10 = layout$1.dock.bottom(), _dec11 = layout$1.stick.center(), _dec12 = layout$1.size(500, 50), _dec13 = layout$1.dock.bottom(), _dec14 = layout$1.stick.center(), _dec15 = layout$1.size(500, 500), _dec16 = layout$1.stick.center(), _dec17 = layout$1.animate({
                 showInitially: false,
                 animation: AnimationController.Animation.FadedZoom,
                 transition: { duration: 500 }
-            }), _dec19 = layout$1.stick.center(), _dec20 = layout$1.size(500, 100), _dec21 = layout$1.dock.bottom(), _dec22 = layout$1.stick.center(), _dec23 = event.on('keyup', function (e) {
-                if (e.keyCode == 13) {
-                    this.showRenderable('submitedmessage');
-                }
-            }), (_class$6 = function (_View) {
+            }), _dec18 = layout$1.stick.center(), _dec19 = layout$1.size(500, 100), _dec20 = layout$1.dock.bottom(), _dec21 = layout$1.stick.center(), (_class$6 = function (_View) {
                 _inherits(HomeView, _View);
 
                 //The Message
@@ -55545,12 +55490,16 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
 
                     _initDefineProp(_this, 'submitedmessage', _descriptor6, _this);
 
-                    _initDefineProp(_this, 'chatmessage', _descriptor7, _this);
+                    _initDefineProp(_this, 'inputmessage', _descriptor7, _this);
 
                     return _this;
                 }
+                // @event.on('keyup', function(e) { if (e.keyCode == 13) { this.showRenderable('submitedmessage'); }})
+
 
                 //Inputfield for chat message
+
+                // @event.on('click', function(){ this.showRenderable('submitedmessage'); })
 
                 //Sendbutton
 
@@ -55589,7 +55538,7 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                 initializer: function initializer() {
                     return new Surface({});
                 }
-            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec12, _dec13, _dec14, _dec15], {
+            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec12, _dec13, _dec14], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new InputSurface({
@@ -55602,15 +55551,12 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                         }
                     });
                 }
-            }), _descriptor6 = _applyDecoratedDescriptor(_class$6.prototype, 'submitedmessage', [_dec16, _dec17, _dec18, _dec19], {
+            }), _descriptor6 = _applyDecoratedDescriptor(_class$6.prototype, 'submitedmessage', [_dec15, _dec16, _dec17, _dec18], {
                 enumerable: true,
                 initializer: function initializer() {
-                    return new Surface({
-                        content: this.chatmessage.getValue(),
-                        properties: { textAlign: 'left' }
-                    });
+                    return new Surface();
                 }
-            }), _descriptor7 = _applyDecoratedDescriptor(_class$6.prototype, 'chatmessage', [_dec20, _dec21, _dec22, _dec23], {
+            }), _descriptor7 = _applyDecoratedDescriptor(_class$6.prototype, 'inputmessage', [_dec19, _dec20, _dec21], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new InputSurface({
@@ -55624,6 +55570,1200 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                 }
             })), _class$6));
 
+            PrioritisedArray = function (_extendableBuiltin2) {
+                _inherits(PrioritisedArray, _extendableBuiltin2);
+
+                _createClass(PrioritisedArray, [{
+                    key: 'length',
+
+                    /* Extending Array does not work fluently yet. The length property always returns 0,
+                     * regardless of how many entries are in the array. We'll override the length prop to determine
+                     * the amount of enumerable properties in our PrioritisedArray instead of using the built-in length property.
+                     */
+                    get: function get() {
+                        return Object.keys(this).length;
+                    },
+                    set: function set(value) {
+                        return value;
+                    }
+
+                    /**
+                     *
+                     * @param {Function} dataType DataType of the models being added to the PrioritisedArray.
+                     * @param {DataSource} dataSource Optional: dataSource to load the models from. If none is given, a new DataSource is made with a path guessed from
+                     * the model's DataType name.
+                     * @param {Snapshot} dataSnapshot Optional: snapshot already containing model data. Prevents initial subscription on all values in the DataSource.
+                     * @param {Object} options Optional: options to pass to the dataSource if none is provided and a new one is constructed.
+                     * @returns {PrioritisedArray} PrioritisedArray instance.
+                     */
+
+                }]);
+
+                function PrioritisedArray(dataType) {
+                    var dataSource = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+                    var dataSnapshot = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+                    var options = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+                    var modelOptions = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
+
+                    _classCallCheck(this, PrioritisedArray);
+
+                    /**** Callbacks ****/
+
+                    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PrioritisedArray).call(this));
+
+                    _this._valueChangedCallback = null;
+                    _this._ids = {};
+
+                    /**** Private properties ****/
+                    _this._dataType = dataType;
+                    _this._dataSource = dataSource;
+                    _this._isBeingReordered = false;
+                    _this._modelOptions = modelOptions;
+                    /* Flag to determine when we're reordering so we don't listen to move updates */
+                    _this._eventEmitter = new EventEmitter();
+                    _this._childAddedThrottler = new Throttler(1, true, _this, true);
+                    _this._overrideChildAddedForId = null;
+
+                    /* Bind all local methods to the current object instance, so we can refer to "this"
+                     * in the methods as expected, even when they're called from event handlers.        */
+                    ObjectHelper.bindAllMethods(_this, _this);
+
+                    /* Hide all private properties (starting with '_') and methods from enumeration,
+                     * so when you do for( in ), only actual data properties show up. */
+                    ObjectHelper.hideMethodsAndPrivatePropertiesFromObject(_this);
+
+                    /* Hide the priority field from enumeration, so we don't save it to the dataSource. */
+                    ObjectHelper.hidePropertyFromObject(Object.getPrototypeOf(_this), 'length');
+
+                    /* If no dataSource is given, create own one with guessed path */
+                    if (!dataSource) {
+                        /* The this._name property can be set by Arva's babel-plugin-transform-runtime-constructor-name plugin.
+                         * This allows Arva code to be minified and mangled without losing automated model name resolving.
+                         * If the plugin is not set up to run, which is done e.g. when not minifying your code, we default back to the runtime constructor name. */
+                        var path = _this.constructor._name || Object.getPrototypeOf(_this).constructor.name;
+                        /* Retrieve dataSource from the DI context */
+                        dataSource = Injection.get(DataSource);
+
+                        if (options) {
+                            dataSource = dataSource.child(options.path || path, options);
+                        } else {
+                            dataSource = dataSource.child(path);
+                        }
+
+                        _this._dataSource = dataSource;
+                    }
+
+                    /* If a snapshot is present use it, otherwise generate one by subscribing to the dataSource one time. */
+                    if (dataSnapshot) {
+                        _this._buildFromSnapshot(dataSnapshot);
+                    } else {
+                        _this._buildFromDataSource(dataSource);
+                    }
+                    return _this;
+                }
+
+                /**
+                 * Subscribes to events emitted by this PrioritisedArray.
+                 * @param {String} event One of the following Event Types: 'value', 'child_changed', 'child_moved', 'child_removed'.
+                 * @param {Function} handler Function that is called when the given event type is emitted.
+                 * @param {Object} context Optional: context of 'this' inside the handler function when it is called.
+                 * @returns {void}
+                 */
+
+                _createClass(PrioritisedArray, [{
+                    key: 'on',
+                    value: function on(event, handler, context) {
+                        var _this2 = this;
+
+                        /* If we're already ready, fire immediately */
+                        if ((event === 'ready' || event === 'value') && this._dataSource && this._dataSource.ready) {
+                            handler.call(context, this);
+                        }
+
+                        /* If we already have children stored locally when the subscriber calls this method,
+                         * fire their callback for all pre-existing children. */
+                        if (event === 'child_added') {
+                            var _loop = function _loop(i) {
+                                _this2._childAddedThrottler.add(function () {
+                                    var model = _this2[i];
+                                    var previousSiblingID = i > 0 ? _this2[i - 1].id : null;
+                                    handler.call(context, model, previousSiblingID);
+                                });
+                            };
+
+                            for (var i = 0; i < this.length; i++) {
+                                _loop(i);
+                            }
+                        }
+
+                        this._eventEmitter.on(event, handler, context);
+                    }
+
+                    /**
+                     * Subscribes to the given event type exactly once; it automatically unsubscribes after the first time it is triggered.
+                     * @param {String} event One of the following Event Types: 'value', 'child_changed', 'child_moved', 'child_removed'.
+                     * @param {Function} [handler] Function that is called when the given event type is emitted.
+                     * @param {Object} [context] context of 'this' inside the handler function when it is called.
+                     * @returns {Promise} If no callback function provided, a promise that resolves once the event has happened
+                     */
+
+                }, {
+                    key: 'once',
+                    value: function once(event, handler) {
+                        var _this3 = this;
+
+                        var context = arguments.length <= 2 || arguments[2] === undefined ? this : arguments[2];
+
+                        if (!handler) {
+                            return new Promise(function (resolve) {
+                                return _this3.once(event, resolve, context);
+                            });
+                        }
+                        return this.on(event, function onceWrapper() {
+                            this.off(event, onceWrapper, context);
+                            handler.call.apply(handler, [context].concat(Array.prototype.slice.call(arguments)));
+                        }, this);
+                    }
+
+                    /**
+                     * Removes subscription to events emitted by this PrioritisedArray. If no handler or context is given, all handlers for
+                     * the given event are removed. If no parameters are given at all, all event types will have their handlers removed.
+                     * @param {String} event One of the following Event Types: 'value', 'child_changed', 'child_moved', 'child_removed'.
+                     * @param {Function} handler Function to remove from event callbacks.
+                     * @param {Object} context Object to bind the given callback function to.
+                     * @returns {void}
+                     */
+
+                }, {
+                    key: 'off',
+                    value: function off(event, handler, context) {
+                        if (event && (handler || context)) {
+                            this._eventEmitter.removeListener(event, handler, context);
+                        } else {
+                            this._eventEmitter.removeAllListeners(event);
+                        }
+                    }
+
+                    /**
+                     * Adds a model instance to the rear of the PrioritisedArray, and emits a 'child_added' and possibly 'new_child' event after successful addition.
+                     * @param {Model|Object} model Instance of a Model.
+                     * @param {String} prevSiblingId ID of the model preceding the one that will be added.
+                     * @returns {Object} Same model as the one originally passed as parameter.
+                     */
+
+                }, {
+                    key: 'add',
+                    value: function add(model) {
+                        var prevSiblingId = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+                        if (model instanceof this._dataType) {
+                            if (this.findIndexById(model.id) < 0) {
+
+                                if (prevSiblingId) {
+                                    var newPosition = this.findIndexById(prevSiblingId) + 1;
+                                    this.insertAt(model, newPosition);
+                                } else {
+                                    this.push(model);
+                                }
+
+                                /* If we've already received an on('value') result, this child addition is
+                                 * a new entry that wasn't on the dataSource before. */
+                                if (this._dataSource.ready) {
+                                    this._eventEmitter.emit('new_child', model, prevSiblingId);
+                                }
+
+                                this._eventEmitter.emit('child_added', model, prevSiblingId);
+                                return model;
+                            }
+                        } else if (model instanceof Object) {
+                            /* Let's try to parse the object using property reflection */
+                            var options = { dataSource: this._dataSource };
+                            /* Prevent child_added from being fired immediately when the model is created by creating a promise that resolves
+                             * the ID that shouldn't be synced twice
+                             */
+
+                            this._overrideChildAddedForId = this.once('local_child_added');
+                            var newModel = new this._dataType(null, model, _.extend({}, this._modelOptions, options));
+
+                            this.add(newModel);
+                            /* Remove lock */
+                            this._eventEmitter.emit('local_child_added', newModel);
+                            this._overrideChildAddedForId = null;
+                            return newModel;
+                        } else {
+                            /* TODO: change to throw exception */
+                            console.log('Tried to append an object that is not the same type as the one this PrioritisedArray was created with.');
+                        }
+
+                        /* Return model so we can do this: let newModel = PrioArray.add(new Model()); newModel.someProperty = true; */
+                        return null;
+                    }
+
+                    /**
+                     * Inserts a model instance at the given position of the PrioritisedArray, and recalculates the priority (position)
+                     * of all models after the inserted position.
+                     * @param {Model} model Subclass of Model
+                     * @param {Number} position Zero-based index where to put the new model instance.
+                     * @returns {Object} Same model as the one originally passed as parameter.
+                     */
+
+                }, {
+                    key: 'insertAt',
+                    value: function insertAt(model, position) {
+                        if (model instanceof this._dataType) {
+                            for (var i = position; i < this.length; i++) {
+                                /* Increase the index of items further on in the prio array */
+                                this._ids[this[i].id]++;
+                            }
+                            this.splice(position, 0, model);
+                            this._ids[model._id] = position;
+                        } else {
+                            /* TODO: change to throw exception */
+                            console.log('Tried to append an object that is not the same type as the PrioritisedArray was created with.');
+                        }
+
+                        /* Return model so we can do this: let newModel = PrioArray.add(new Model()); newModel.someProperty = true; */
+                        return model;
+                    }
+                }, {
+                    key: 'push',
+                    value: function push(model) {
+                        return this.insertAt(model, this.length);
+                    }
+
+                    /**
+                     * Removes the model instance at the given position. Does not remove the model from the datasource, to do that
+                     * call model.remove() directly, or PrioArray[index].remove().
+                     * @param {Number} position Index in the PrioritisedArray of the model to remove.
+                     * @returns {void}
+                     */
+
+                }, {
+                    key: 'remove',
+                    value: function remove(position) {
+                        /*
+                         * TODO: Beware, there might be hard to reproduce prone to errors going on sometimes when deleting many things at once
+                         * Sometimes, there is an inconsistent state, but I haven't been able to figure out how that happens. /Karl
+                         */
+                        if (this.length === 1) {
+                            this._ids = {};
+                        } else {
+                            for (var i = position; i < this.length; i++) {
+                                /* Decrease the index of items further on in the prio array */
+                                if (!this._ids[this[i].id] && this._ids[this[i].id] !== 0) {
+                                    console.log("Internal error, decreasing index of non-existing id. For ID: " + this[i].id);
+                                }
+                                this._ids[this[i].id]--;
+                            }
+                        }
+                        this.splice(position, 1);
+                    }
+
+                    /**
+                     * Interprets all childs of a given snapshot as instances of the given data type for this PrioritisedArray,
+                     * and attempts to instantiate new model instances based on these sub-snapshots. It adds them to the
+                     * PrioritisedArray, which also assigns their priority based on their inserted position.
+                     * @param {Snapshot} dataSnapshot Snapshot to build the PrioritisedArray from.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_buildFromSnapshot',
+                    value: function _buildFromSnapshot(dataSnapshot) {
+
+                        var numChildren = dataSnapshot.numChildren(),
+                            currentChild = 1;
+
+                        /* If there is no data at this point yet, fire a ready event */
+                        if (numChildren === 0) {
+                            this._dataSource.ready = true;
+                            this._eventEmitter.emit('ready');
+                            this._eventEmitter.emit('value', this);
+                        }
+
+                        dataSnapshot.forEach(function (child) {
+                            this._childAddedThrottler.add(function (child) {
+                                /* Create a new instance of the given data type and prefill it with the snapshot data. */
+                                var options = { dataSnapshot: child };
+                                var childRef = this._dataSource.child(child.key);
+
+                                /* whenever the ref() is a datasource, we can bind that source to the model.
+                                 * whenever it's not a datasource, we assume the model should instantiate a new
+                                 * datasource to bind the model */
+
+                                if (childRef instanceof DataSource) {
+                                    options.dataSource = childRef;
+                                } else {
+                                    var rootPath = dataSnapshot.ref().root().toString();
+                                    options.path = dataSnapshot.ref().toString().replace(rootPath, '/');
+                                }
+
+                                var newModel = new this._dataType(child.key, child.val(), _.extend({}, this._modelOptions, options));
+                                this.add(newModel);
+
+                                /* If this is the last child, fire a ready event */
+                                if (currentChild++ === numChildren) {
+                                    this._dataSource.ready = true;
+                                    this._eventEmitter.emit('ready');
+                                    this._eventEmitter.emit('value', this);
+                                }
+                            }.bind(this, child));
+                        }.bind(this));
+                    }
+
+                    /**
+                     * Clones a dataSource (to not disturb any existing callbacks defined on the original) and uses it
+                     * to get a dataSnapshot which is used in _buildSnapshot to build our array.
+                     * @param {DataSource} dataSource DataSource to subscribe to for building the PrioritisedArray.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_buildFromDataSource',
+                    value: function _buildFromDataSource(dataSource) {
+                        var _this4 = this;
+
+                        dataSource.once('value', function (dataSnapshot) {
+                            _this4._buildFromSnapshot(dataSnapshot);
+                            _this4._registerCallbacks(dataSource);
+                        });
+                    }
+
+                    /**
+                     * Registers the added, moved, changed, and removed callbacks to the given DataSource.
+                     * @param {DataSource} dataSource DataSource to register callbacks on.
+                     * @return {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_registerCallbacks',
+                    value: function _registerCallbacks(dataSource) {
+                        dataSource.on('child_added', this._doOnceReady(this._onChildAdded));
+                        dataSource.on('child_moved', this._doOnceReady(this._onChildMoved));
+                        dataSource.on('child_changed', this._doOnceReady(this._onChildChanged));
+                        dataSource.on('child_removed', this._doOnceReady(this._onChildRemoved));
+                    }
+                }, {
+                    key: '_doOnceReady',
+                    value: function _doOnceReady(callback) {
+                        var _this5 = this;
+
+                        return function () {
+                            for (var _len = arguments.length, otherArgs = Array(_len), _key = 0; _key < _len; _key++) {
+                                otherArgs[_key] = arguments[_key];
+                            }
+
+                            if (!_this5._dataSource.ready) {
+                                _this5.once('ready', function () {
+                                    return callback.apply(undefined, otherArgs);
+                                });
+                            } else {
+                                return callback.apply(undefined, otherArgs);
+                            }
+                        };
+                    }
+
+                    /**
+                     * Called by dataSource when a new child is added.
+                     * @param {Snapshot} snapshot Snapshot of the added child.
+                     * @param {String} prevSiblingId ID of the model preceding the added model.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_onChildAdded',
+                    value: function _onChildAdded(snapshot, prevSiblingId) {
+                        var _this6 = this;
+
+                        var id = snapshot.key;
+                        if (this._overrideChildAddedForId) {
+                            this._overrideChildAddedForId.then(function (newModel) {
+                                /* If the override is concerning another id, then go ahead and make the _onChildAdded */
+                                if (newModel.id !== id) {
+                                    _this6._onChildAdded(snapshot, prevSiblingId);
+                                }
+                                /* Otherwise, don't recreate the same model twice */
+                            });
+                            return;
+                        }
+
+                        /* Skip addition if an item with identical ID already exists. */
+                        var previousPosition = this.findIndexById(id);
+                        if (previousPosition >= 0) {
+                            return;
+                        }
+
+                        var model = new this._dataType(id, null, _.extend({}, this._modelOptions, {
+                            dataSnapshot: snapshot
+                        }));
+                        this.add(model, prevSiblingId);
+
+                        if (!this._dataSource.ready) {
+                            this._dataSource.ready = true;
+                            this._eventEmitter.emit('ready');
+                        }
+                        this._eventEmitter.emit('value', this);
+                    }
+
+                    /**
+                     * Called by dataSource when a child is changed.
+                     * @param {Snapshot} snapshot Snapshot of the added child.
+                     * @param {String} prevSiblingId ID of the model preceding the added model.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_onChildChanged',
+                    value: function _onChildChanged(snapshot, prevSiblingId) {
+                        var id = snapshot.key;
+
+                        var previousPosition = this.findIndexById(id);
+                        if (previousPosition < 0) {
+                            /* The model doesn't exist, so we won't emit a changed event. */
+                            return;
+                        }
+
+                        var model = this[previousPosition];
+                        model._onChildValue(snapshot, prevSiblingId);
+                        var newPosition = this.findIndexById(prevSiblingId) + 1;
+
+                        this._moveItem(previousPosition, newPosition, model);
+
+                        this._eventEmitter.emit('child_changed', model, prevSiblingId);
+                        this._eventEmitter.emit('value', this);
+                    }
+
+                    /**
+                     * Called by dataSource when a child is moved, which changes its priority.
+                     * @param {Snapshot} snapshot Snapshot of the added child.
+                     * @param {String} prevSiblingId ID of the model preceding the added model.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_onChildMoved',
+                    value: function _onChildMoved(snapshot, prevSiblingId) {
+                        /* Ignore priority updates whilst we're reordering to avoid floods */
+                        if (!this._isBeingReordered) {
+
+                            var id = snapshot.key;
+                            var previousPosition = this.findIndexById(id);
+                            var newPosition = this.findIndexById(prevSiblingId) + 1;
+                            var tempModel = this[previousPosition];
+                            this._moveItem(previousPosition, newPosition, tempModel);
+
+                            var model = this[newPosition];
+
+                            this._eventEmitter.emit('child_moved', model, previousPosition);
+                            this._eventEmitter.emit('value', this);
+                        }
+                    }
+                }, {
+                    key: '_moveItem',
+                    value: function _moveItem(previousPosition, newPosition, modelToMove) {
+                        this._ids[modelToMove._id] = newPosition;
+                        /* Update the positions of things coming inbetween */
+                        for (var positionAhead = previousPosition; positionAhead < newPosition; positionAhead++) {
+                            this._ids[this[positionAhead].id]--;
+                        }
+                        for (var positionBefore = newPosition; positionBefore < previousPosition; positionBefore++) {
+                            this._ids[this[positionBefore].id]++;
+                        }
+
+                        if (previousPosition === newPosition) {
+                            this[newPosition] = modelToMove;
+                        } else {
+                            this.splice(previousPosition, 1);
+                            this.splice(newPosition, 0, modelToMove);
+                        }
+                    }
+
+                    /**
+                     * Called by dataSource when a child is removed.
+                     * @param {Snapshot} oldSnapshot Snapshot of the added child.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_onChildRemoved',
+                    value: function _onChildRemoved(oldSnapshot) {
+                        /* TODO: figure out if we can use the snapshot's priority as our array index reliably, to avoid big loops. */
+                        var id = oldSnapshot.key;
+                        var position = this.findIndexById(id);
+                        var model = this[position];
+
+                        if (position !== -1) {
+                            this.remove(position);
+                            delete this._ids[id];
+
+                            this._eventEmitter.emit('child_removed', model);
+                            this._eventEmitter.emit('value', this);
+                        }
+                    }
+
+                    /**
+                     * Return the position of model's id, saved in an associative array
+                     * @param {Number} id Id field of the model we're looking for
+                     * @returns {Number} Zero-based index if found, -1 otherwise
+                     * @private
+                     */
+
+                }, {
+                    key: 'findIndexById',
+                    value: function findIndexById(id) {
+                        var position = this._ids[id];
+                        return position == undefined || position == null ? -1 : position;
+                    }
+                }, {
+                    key: 'findById',
+                    value: function findById(id) {
+                        return this[this.findIndexById(id)];
+                    }
+                }]);
+
+                return PrioritisedArray;
+            }(_extendableBuiltin(Array));
+
+            _get = function get(object, property, receiver) {
+                if (object === null) object = Function.prototype;
+                var desc = Object.getOwnPropertyDescriptor(object, property);
+
+                if (desc === undefined) {
+                    var parent = Object.getPrototypeOf(object);
+
+                    if (parent === null) {
+                        return undefined;
+                    } else {
+                        return get(parent, property, receiver);
+                    }
+                } else if ("value" in desc) {
+                    return desc.value;
+                } else {
+                    var getter = desc.get;
+
+                    if (getter === undefined) {
+                        return undefined;
+                    }
+
+                    return getter.call(receiver);
+                }
+            };
+
+            PrioritisedObject = function (_EventEmitter) {
+                _inherits(PrioritisedObject, _EventEmitter);
+
+                _createClass(PrioritisedObject, [{
+                    key: 'id',
+                    get: function get() {
+                        return this._id;
+                    },
+                    set: function set(value) {
+                        this._id = value;
+                    }
+
+                    /** Priority (positioning) of the object in the dataSource */
+
+                }, {
+                    key: 'priority',
+                    get: function get() {
+                        return this._priority;
+                    },
+                    set: function set(value) {
+                        if (this._priority !== value) {
+                            this._priority = value;
+                            this._dataSource.setPriority(value);
+                        }
+                    }
+
+                    /* TODO: refactor out after we've resolved SharepointDataSource specific issue. */
+
+                }, {
+                    key: 'dataSource',
+                    get: function get() {
+                        return this._dataSource;
+                    }
+                }, {
+                    key: '_inheritable',
+                    get: function get() {
+                        return this._dataSource ? this._dataSource.inheritable : false;
+                    }
+
+                    /**
+                     * @param {DataSource} dataSource DataSource to construct this PrioritisedObject with.
+                     * @param {Snapshot} dataSnapshot Optional: dataSnapshot already containing model data, so we can skip subscribing to the full data on the dataSource.
+                     * @returns {PrioritisedObject} PrioritisedObject instance.
+                     */
+
+                }]);
+
+                function PrioritisedObject(dataSource) {
+                    var dataSnapshot = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+                    _classCallCheck(this, PrioritisedObject);
+
+                    /**** Callbacks ****/
+
+                    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PrioritisedObject).call(this));
+
+                    _this._valueChangedCallback = null;
+
+                    /**** Private properties ****/
+                    _this._id = dataSource ? dataSource.key() : 0;
+                    _this._events = _this._events || [];
+                    _this._dataSource = dataSource;
+                    _this._priority = 0; // Priority of this object on remote dataSource
+                    _this._isBeingWrittenByDatasource = false; // Flag to determine when dataSource is updating object
+
+                    /* Bind all local methods to the current object instance, so we can refer to "this"
+                     * in the methods as expected, even when they're called from event handlers.        */
+                    ObjectHelper.bindAllMethods(_this, _this);
+
+                    /* Hide all private properties (starting with '_') and methods from enumeration,
+                     * so when you do for( in ), only actual data properties show up. */
+                    ObjectHelper.hideMethodsAndPrivatePropertiesFromObject(_this);
+
+                    /* Hide the id field from enumeration, so we don't save it to the dataSource. */
+                    ObjectHelper.hidePropertyFromObject(_this, 'id');
+
+                    /* Hide the priority field from enumeration, so we don't save it to the dataSource. */
+                    ObjectHelper.hidePropertyFromObject(_this, 'priority');
+
+                    /* Hide the dataSource field from enumeration, so we don't save it to the dataSource. */
+                    ObjectHelper.hidePropertyFromObject(_this, 'dataSource');
+
+                    if (dataSnapshot) {
+                        _this._buildFromSnapshot(dataSnapshot);
+                    } else {
+                        _this._buildFromDataSource(dataSource);
+                    }
+                    return _this;
+                }
+
+                /**
+                 *  Deletes the current object from the dataSource, and clears itself to free memory.
+                 *  @returns {void}
+                 */
+
+                _createClass(PrioritisedObject, [{
+                    key: 'remove',
+                    value: function remove() {
+                        this.off();
+                        this._dataSource.remove(this);
+                        delete this;
+                    }
+
+                    /**
+                     * Subscribes to the given event type exactly once; it automatically unsubscribes after the first time it is triggered.
+                     * @param {String} event One of the following Event Types: 'value', 'child_changed', 'child_moved', 'child_removed'.
+                     * @param {Function} handler Function that is called when the given event type is emitted.
+                     * @param {Object} context Optional: context of 'this' inside the handler function when it is called.
+                     * @returns {void}
+                     */
+
+                }, {
+                    key: 'once',
+                    value: function once(event, handler) {
+                        var context = arguments.length <= 2 || arguments[2] === undefined ? this : arguments[2];
+
+                        return this.on(event, function onceWrapper() {
+                            handler.call.apply(handler, [context].concat(Array.prototype.slice.call(arguments)));
+                            this.off(event, onceWrapper, context);
+                        }, this);
+                    }
+
+                    /**
+                     * Subscribes to events emitted by this PrioritisedArray.
+                     * @param {String} event One of the following Event Types: 'value', 'child_changed', 'child_moved', 'child_removed'.
+                     * @param {Function} handler Function that is called when the given event type is emitted.
+                     * @param {Object} context Optional: context of 'this' inside the handler function when it is called.
+                     * @returns {void}
+                     */
+
+                }, {
+                    key: 'on',
+                    value: function on(event, handler) {
+                        var context = arguments.length <= 2 || arguments[2] === undefined ? this : arguments[2];
+
+                        var haveListeners = this.listeners(event, true);
+                        _get(Object.getPrototypeOf(PrioritisedObject.prototype), 'on', this).call(this, event, handler, context);
+
+                        switch (event) {
+                            case 'ready':
+                                /* If we're already ready, fire immediately */
+                                if (this._dataSource && this._dataSource.ready) {
+                                    handler.call(context, this);
+                                }
+                                break;
+                            case 'value':
+                                if (!haveListeners) {
+                                    /* Only subscribe to the dataSource if there are no previous listeners for this event type. */
+                                    this._dataSource.setValueChangedCallback(this._onChildValue);
+                                } else {
+                                    if (this._dataSource.ready) {
+                                        /* If there are previous listeners, fire the value callback once to present the subscriber with inital data. */
+                                        handler.call(context, this);
+                                    }
+                                }
+                                break;
+                            case 'added':
+                                if (!haveListeners) {
+                                    this._dataSource.setChildAddedCallback(this._onChildAdded);
+                                }
+                                break;
+                            case 'moved':
+                                if (!haveListeners) {
+                                    this._dataSource.setChildMovedCallback(this._onChildMoved);
+                                }
+                                break;
+                            case 'removed':
+                                if (!haveListeners) {
+                                    this._dataSource.setChildRemovedCallback(this._onChildRemoved);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    /**
+                     * Removes subscription to events emitted by this PrioritisedArray. If no handler or context is given, all handlers for
+                     * the given event are removed. If no parameters are given at all, all event types will have their handlers removed.
+                     * @param {String} event One of the following Event Types: 'value', 'child_changed', 'child_moved', 'child_removed'.
+                     * @param {Function} handler Function to remove from event callbacks.
+                     * @param {Object} context Object to bind the given callback function to.
+                     * @returns {void}
+                     */
+
+                }, {
+                    key: 'off',
+                    value: function off(event, handler, context) {
+                        if (event && (handler || context)) {
+                            _get(Object.getPrototypeOf(PrioritisedObject.prototype), 'removeListener', this).call(this, event, handler, context);
+                        } else {
+                            _get(Object.getPrototypeOf(PrioritisedObject.prototype), 'removeAllListeners', this).call(this, event);
+                        }
+
+                        /* If we have no more listeners of this event type, remove dataSource callback. */
+                        if (!this.listeners(event, true)) {
+                            switch (event) {
+                                case 'ready':
+                                    break;
+                                case 'value':
+                                    this._dataSource.removeValueChangedCallback();
+                                    break;
+                                case 'added':
+                                    this._dataSource.removeChildAddedCallback();
+                                    break;
+                                case 'moved':
+                                    this._dataSource.removeChildMovedCallback();
+                                    break;
+                                case 'removed':
+                                    this._dataSource.removeChildRemovedCallback();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+
+                    /**
+                     * Allows multiple modifications to be made to the model without triggering dataSource pushes and event emits for each change.
+                     * Triggers a push to the dataSource after executing the given method. This push should then emit an event notifying subscribers of any changes.
+                     * @param {Function} method Function in which the model can be modified.
+                     * @returns {void}
+                     */
+
+                }, {
+                    key: 'transaction',
+                    value: function transaction(method) {
+                        this.disableChangeListener();
+                        method();
+                        this.enableChangeListener();
+                        return this._onSetterTriggered();
+                    }
+
+                    /**
+                     * Disables pushes of local changes to the dataSource, and stops event emits that refer to the model's data.
+                     * @returns {void}
+                     */
+
+                }, {
+                    key: 'disableChangeListener',
+                    value: function disableChangeListener() {
+                        this._isBeingWrittenByDatasource = true;
+                    }
+
+                    /**
+                     * Enables pushes of local changes to the dataSource, and enables event emits that refer to the model's data.
+                     * The change listener is active by default, so you'll only need to call this method if you've previously called disableChangeListener().
+                     * @returns {void}
+                     */
+
+                }, {
+                    key: 'enableChangeListener',
+                    value: function enableChangeListener() {
+                        this._isBeingWrittenByDatasource = false;
+                    }
+
+                    /**
+                     * Recursively builds getter/setter based properties on current PrioritisedObject from
+                     * a given dataSnapshot. If an object value is detected, the object itself gets built as
+                     * another PrioritisedObject and set to the current PrioritisedObject as a property.
+                     * @param {Snapshot} dataSnapshot DataSnapshot to build the PrioritisedObject from.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_buildFromSnapshot',
+                    value: function _buildFromSnapshot(dataSnapshot) {
+
+                        /* Set root object _priority */
+                        this._priority = dataSnapshot.getPriority();
+                        var data = dataSnapshot.val();
+                        var numChildren = dataSnapshot.numChildren();
+
+                        if (!this._id) {
+                            this._id = dataSnapshot.key;
+                        }
+
+                        if (!this._dataSource) {
+                            this._dataSource = dataSnapshot.ref;
+                        }
+
+                        /* If there is no data at this point yet, fire a ready event */
+                        if (numChildren === 0) {
+                            this._dataSource.ready = true;
+                            this.emit('ready');
+                            return;
+                        }
+
+                        for (var key in data) {
+                            /* Only map properties that exists on our model */
+                            var ownPropertyDescriptor = Object.getOwnPropertyDescriptor(this, key);
+                            if (ownPropertyDescriptor && ownPropertyDescriptor.enumerable) {
+                                /* If child is a primitive, listen to changes so we can synch with Firebase */
+                                ObjectHelper.addPropertyToObject(this, key, data[key], true, true, this._onSetterTriggered);
+                            }
+                        }
+
+                        this._dataSource.ready = true;
+                        this.emit('ready');
+                    }
+
+                    /**
+                     * Clones a dataSource (to not disturb any existing callbacks defined on the original) and uses it
+                     * to get a dataSnapshot which is used in _buildSnapshot to build our object.
+                     * @param {DataSource} dataSource DataSource to build the PrioritisedObject from.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_buildFromDataSource',
+                    value: function _buildFromDataSource(dataSource) {
+                        if (!dataSource) {
+                            return;
+                        }
+                        dataSource.once('value', this._buildFromSnapshot);
+                    }
+
+                    /**
+                     * Gets called whenever a property value is set on this object.
+                     * This can happen when local code modifies it, or when the dataSource updates it.
+                     * We only propagate changes to the dataSource if the change was local.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_onSetterTriggered',
+                    value: function _onSetterTriggered() {
+                        if (!this._isBeingWrittenByDatasource) {
+                            return this._dataSource.setWithPriority(ObjectHelper.getEnumerableProperties(this), this._priority);
+                        }
+                    }
+
+                    /**
+                     * Gets called whenever the current PrioritisedObject is changed by the dataSource.
+                     * @param {Snapshot} dataSnapshot Snapshot of the new object value.
+                     * @param {String} previousSiblingID ID of the model preceding the current one.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_onChildValue',
+                    value: function _onChildValue(dataSnapshot, previousSiblingID) {
+
+                        /* If the new dataSource data is equal to what we have locally,
+                         * this is an update triggered by a local change having been pushed
+                         * to the remote dataSource. We can ignore it.
+                         */
+                        if (_.isEqual(ObjectHelper.getEnumerableProperties(this), dataSnapshot.val())) {
+                            this.emit('value', this, previousSiblingID);
+                            return;
+                        }
+
+                        /* Make sure we don't trigger pushes to dataSource whilst repopulating with new dataSource data */
+                        this._isBeingWrittenByDatasource = true;
+                        this._buildFromSnapshot(dataSnapshot);
+                        this._isBeingWrittenByDatasource = false;
+
+                        this.emit('value', this, previousSiblingID);
+                    }
+
+                    /* TODO: implement partial updates of model */
+
+                }, {
+                    key: '_onChildAdded',
+                    value: function _onChildAdded(dataSnapshot, previousSiblingID) {
+                        this.emit('added', this, previousSiblingID);
+                    }
+                }, {
+                    key: '_onChildMoved',
+                    value: function _onChildMoved(dataSnapshot, previousSiblingID) {
+                        this.emit('moved', this, previousSiblingID);
+                    }
+                }, {
+                    key: '_onChildRemoved',
+                    value: function _onChildRemoved(dataSnapshot, previousSiblingID) {
+                        this.emit('removed', this, previousSiblingID);
+                    }
+                }]);
+
+                return PrioritisedObject;
+            }(EventEmitter);
+
+            Model = function (_PrioritisedObject) {
+                _inherits(Model, _PrioritisedObject);
+
+                /**
+                 * Creates a new instance of a model.
+                 * @param {String} id Optional: The identifier for this model. For a user model this might be a user ID, for example. It
+                 *           is used to build the path to the dataSource. This path is <root>/<model name appended with 's'>/<id>.
+                 *           If no id is given, a randomly generated one will be pushed to the dataSource. You can use this for
+                 *           creating new objects in the dataSource.
+                 * @param {Object} data Optional: The initial data to fill the model with. The model will be extended with any
+                 *                      properties present in the data parameter.
+                 * @param {Object} options Optional: Additional options. Currently used is "dataSnapshot", which if present is used
+                 *                          to fetch the initial model data. If not present, the model will add a one-time
+                 *                          subscription to the dataSource to fetch initial data.
+                 * @returns {Model} Model Instance.
+                 */
+
+                function Model(id) {
+                    var data = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+                    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+                    _classCallCheck(this, Model);
+
+                    /* Retrieve dataSource from the DI context */
+                    var dataSource = options.dataSource || Injection.get(DataSource);
+
+                    /* Replace all stub data fields of any subclass of Model with databinding accessors.
+                     * This causes changes to be synched to and from the dataSource. */
+
+                    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Model).call(this));
+
+                    _this._replaceModelAccessorsWithDatabinding();
+
+                    /* Calculate path to model in dataSource, used if no dataSource or path are given.
+                     *
+                     * The this._name property can be set by Arva's babel-plugin-transform-runtime-constructor-name plugin.
+                     * This allows Arva code to be minified and mangled without losing automated model name resolving.
+                     * If the plugin is not set up to run, which is done e.g. when not minifying your code, we default back to the runtime constructor name. */
+                    var modelName = _this.constructor._name || Object.getPrototypeOf(_this).constructor.name;
+
+                    var pathRoot = modelName + 's';
+
+                    var dataIsSynced = new Promise(function (resolve) {
+                        return _this._dataIsSynced = resolve;
+                    });
+                    var dataSourceOptions = { synced: dataIsSynced };
+
+                    if (options.dataSource && id) {
+                        _this._dataSource = options.dataSource;
+                    } else if (options.dataSource) {
+                        /* No id is present, generate a random one by pushing a new entry to the dataSource. */
+                        _this._dataSource = options.dataSource.push(data);
+                    } else if (options.path && id) {
+                        _this._dataSource = dataSource.child(options.path + '/' + id || '', dataSourceOptions);
+                    } else if (options.dataSnapshot) {
+                        _this._dataSource = dataSource.child(options.dataSnapshot.ref.path.toString(), dataSourceOptions);
+                    } else if (id) {
+                        /* If an id is present, use it to locate our model. */
+                        _this._dataSource = dataSource.child(pathRoot + '/' + id, dataSourceOptions);
+                    } else {
+                        /* No id is present, generate a random one by pushing a new entry to the dataSource. */
+                        if (options.path) {
+                            _this._dataSource = dataSource.child(options.path).push(data);
+                        } else {
+                            _this._dataSource = dataSource.child(pathRoot).push(data);
+                        }
+                    }
+
+                    /* Re-construct core PrioritisedObject with new dataSource */
+                    if (options.dataSnapshot) {
+                        _this._buildFromSnapshot(options.dataSnapshot);
+                    } else {
+                        _this._buildFromDataSource(_this._dataSource);
+                    }
+
+                    /* Write local data to model, if any data is present. */
+                    _this._writeLocalDataToModel(data).then(_this._dataIsSynced);
+                    return _this;
+                }
+
+                /**
+                 * Check if the model has been synchonized with the database
+                 * @returns {Promise} Resolves when the model has been synchonized with the database
+                 */
+
+                _createClass(Model, [{
+                    key: 'synced',
+                    value: function synced() {
+                        return this._dataSource.synced();
+                    }
+
+                    /**
+                     * Replaces all getters/setters defined on the model implementation with properties that trigger update events to the dataSource.
+                     * @returns {void}
+                     * @private
+                     */
+
+                }, {
+                    key: '_replaceModelAccessorsWithDatabinding',
+                    value: function _replaceModelAccessorsWithDatabinding() {
+                        var _this2 = this;
+
+                        var prototype = Object.getPrototypeOf(this);
+
+                        if (~Object.getOwnPropertyNames(prototype).indexOf('id')) {
+                            console.log('Don\'t define an id property to ' + prototype.constructor.name + ', as this property is internally used by the PrioritisedArray');
+                        }
+
+                        /* If the code is minified, then this.constructor._name is defined, in that case that also goes for the inheriting classes */
+                        while (prototype.constructor._name || !this.constructor._name && prototype.constructor.name !== 'Model') {
+                            /* Get all properties except the id and constructor of this model */
+                            var propNames = _.difference(Object.getOwnPropertyNames(prototype), ['constructor', 'id']);
+
+                            for (var _iterator = propNames, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                                var _ref;
+
+                                if (_isArray) {
+                                    if (_i >= _iterator.length) break;
+                                    _ref = _iterator[_i++];
+                                } else {
+                                    _i = _iterator.next();
+                                    if (_i.done) break;
+                                    _ref = _i.value;
+                                }
+
+                                var name = _ref;
+
+                                var descriptor = Object.getOwnPropertyDescriptor(prototype, name);
+                                if (descriptor && descriptor.get) {
+                                    var value = this[name];
+                                    delete this[name];
+                                    ObjectHelper.addPropertyToObject(this, name, value, true, true, function () {
+                                        _this2._onSetterTriggered();
+                                    });
+                                }
+                            }
+
+                            prototype = Object.getPrototypeOf(prototype);
+                        }
+                    }
+
+                    /**
+                     * Writes data, if present, to the Model's dataSource. Uses a transaction, meaning that only one update is triggered to the dataSource,
+                     * even though multiple fields change.
+                     * @param {Object} data Data to write, can be null.
+                     * @returns {Promise} Resolves when the transaction is complete and synced
+                     * @private
+                     */
+
+                }, {
+                    key: '_writeLocalDataToModel',
+                    value: function _writeLocalDataToModel(data) {
+                        if (data) {
+                            var isDataDifferent = false;
+                            for (var name in data) {
+                                if (Object.getOwnPropertyDescriptor(this, name) && this[name] !== data[name]) {
+                                    isDataDifferent = true;
+                                    break;
+                                }
+                            }
+
+                            if (isDataDifferent) {
+                                return this.transaction(function () {
+                                    for (var _name in data) {
+
+                                        // only map properties that exists on our model
+                                        if (Object.getOwnPropertyDescriptor(this, _name)) {
+                                            var value = data[_name];
+                                            this[_name] = value;
+                                        }
+                                    }
+                                }.bind(this));
+                            }
+                        }
+                        return Promise.resolve();
+                    }
+                }]);
+
+                return Model;
+            }(PrioritisedObject);
+
+            ChatMessage = function (_Model) {
+                _inherits(ChatMessage, _Model);
+
+                function ChatMessage() {
+                    _classCallCheck(this, ChatMessage);
+
+                    return _possibleConstructorReturn(this, Object.getPrototypeOf(ChatMessage).apply(this, arguments));
+                }
+
+                _createClass(ChatMessage, [{
+                    key: 'leMessage',
+                    get: function get() {}
+                }], [{
+                    key: '_name',
+                    get: function get() {
+                        return 'ChatMessage';
+                    }
+                }]);
+
+                return ChatMessage;
+            }(Model);
+
+            ChatMessages = function (_PrioritisedArray) {
+                _inherits(ChatMessages, _PrioritisedArray);
+
+                function ChatMessages() {
+                    _classCallCheck(this, ChatMessages);
+
+                    return _possibleConstructorReturn(this, Object.getPrototypeOf(ChatMessages).call(this, ChatMessage));
+                }
+
+                _createClass(ChatMessages, null, [{
+                    key: '_name',
+                    get: function get() {
+                        return 'ChatMessages';
+                    }
+                }]);
+
+                return ChatMessages;
+            }(PrioritisedArray);
+
             HomeController = function (_Controller) {
                 _inherits(HomeController, _Controller);
 
@@ -55636,8 +56776,35 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                 _createClass(HomeController, [{
                     key: 'Index',
                     value: function Index() {
+                        var _this2 = this;
+
+                        var chatmessages = new ChatMessages();
+                        var chatmessage = chatmessages.add(new ChatMessages());
+
                         if (!this.homeView) {
-                            this.homeView = new HomeView({ newMessage: 'How to get value?' });
+                            this.homeView = new HomeView();
+                            //on enter event
+                            this.homeView.inputmessage.on('keyup', function (e) {
+                                if (e.keyCode == 13) {
+                                    console.log('pressed enter');
+                                    console.log(this.homeView.inputmessage.getValue());
+                                    chatmessage.leMessage = this.homeView.inputmessage.getValue();
+
+                                    chatmessages.on('child_added', function (chatmessage) {
+                                        console.log('A new chatmessage appeared! It says ' + chatmessage.leMessage);
+                                    });
+                                }
+                            });
+                            //on click button event
+                            this.homeView.sendbutton.on('click', function () {
+                                console.log('clicked button');
+                                chatmessage.leMessage = _this2.homeView.inputmessage.getValue();
+                                _this2.homeView.inputmessage.setValue('... ... ...');
+
+                                chatmessages.on('child_added', function (chatmessage) {
+                                    console.log('A new chatmessage appeared! It says ' + chatmessage.leMessage);
+                                });
+                            });
                         }
                         return this.homeView;
                     }
