@@ -1,8 +1,12 @@
-import Surface              from 'famous/core/Surface.js';
-import AnimationController  from 'famous-flex/AnimationController.js';
-import {View}               from 'arva-js/core/View.js';
-import {layout, event}      from 'arva-js/layout/Decorators.js';
-import InputSurface         from 'famous/surfaces/InputSurface.js';
+import Surface              	from 'famous/core/Surface.js';
+import AnimationController  	from 'famous-flex/AnimationController.js';
+import {View}               	from 'arva-js/core/View.js';
+import {layout, event}      	from 'arva-js/layout/Decorators.js';
+import InputSurface         	from 'famous/surfaces/InputSurface.js';
+import {DataBoundScrollView}	from 'arva-js/components/DataBoundScrollView.js';
+import {CollectionLayout}       from 'famous-flex/layouts/CollectionLayout';
+import {ChatMessages}		    from '../models/ChatMessages.js';
+import {ChatMessage}		    from '../models/ChatMessage.js';
 
 export class HomeView extends View {
 	//Title
@@ -20,11 +24,11 @@ export class HomeView extends View {
             fontSize: '50px'
         }
     });
-    //Background
+    //Main Background Color
     @layout.translate(0, 0, -10)
     @layout.fullSize()
     background = new Surface({properties: {backgroundColor: 'blanchedalmond'}});
-    //View messages area container
+    //View messages area 
     @layout.translate(0, 0, -5)
     @layout.size(500, 500)
     @layout.stick.center()
@@ -33,6 +37,18 @@ export class HomeView extends View {
             backgroundColor: 'lightblue'
         }
     });
+    //le messages 
+    @layout.translate(0, 0, -4)
+    @layout.size(500, 500)
+    @layout.stick.center()
+    scrollView = new DataBoundScrollView({
+    layout: CollectionLayout,
+    layoutOptions: {
+        itemSize: [undefined, 30]
+    },
+    itemTemplate: (chatmessage) => new Surface({content: `${chatmessage.leMessage}`}),
+    dataStore: new ChatMessages()
+    })
 
     //Footer space
     @layout.size(500,50)

@@ -35943,11 +35943,187 @@ define("145", ["require", "exports", "module", "146"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13d", ["require", "exports", "module", "147", "148", "13f", "149"], function(require, exports, module) {
-  var EventHandler = require('147');
-  var OptionsManager = require('148');
+define("147", ["require", "exports", "module", "148", "149"], function(require, exports, module) {
+  var Utility = require('148');
+  var LayoutUtility = require('149');
+  var capabilities = {
+    sequence: true,
+    direction: [Utility.Direction.Y, Utility.Direction.X],
+    scrolling: true,
+    trueSize: true,
+    sequentialScrollingOptimized: true
+  };
+  var context;
+  var size;
+  var direction;
+  var alignment;
+  var lineDirection;
+  var lineLength;
+  var offset;
+  var margins;
+  var margin = [0, 0];
+  var spacing;
+  var justify;
+  var itemSize;
+  var getItemSize;
+  var lineNodes;
+  function _layoutLine(next, endReached) {
+    if (!lineNodes.length) {
+      return 0;
+    }
+    var i;
+    var lineSize = [0, 0];
+    var lineNode;
+    for (i = 0; i < lineNodes.length; i++) {
+      lineSize[direction] = Math.max(lineSize[direction], lineNodes[i].size[direction]);
+      lineSize[lineDirection] += ((i > 0) ? spacing[lineDirection] : 0) + lineNodes[i].size[lineDirection];
+    }
+    var justifyOffset = justify[lineDirection] ? ((lineLength - lineSize[lineDirection]) / (lineNodes.length * 2)) : 0;
+    var lineOffset = (direction ? margins[3] : margins[0]) + justifyOffset;
+    var scrollLength;
+    for (i = 0; i < lineNodes.length; i++) {
+      lineNode = lineNodes[i];
+      var translate = [0, 0, 0];
+      translate[lineDirection] = lineOffset;
+      translate[direction] = next ? offset : (offset - (lineSize[direction]));
+      scrollLength = 0;
+      if (i === 0) {
+        scrollLength = lineSize[direction];
+        if (endReached && ((next && !alignment) || (!next && alignment))) {
+          scrollLength += direction ? (margins[0] + margins[2]) : (margins[3] + margins[1]);
+        } else {
+          scrollLength += spacing[direction];
+        }
+      }
+      lineNode.set = {
+        size: lineNode.size,
+        translate: translate,
+        scrollLength: scrollLength
+      };
+      lineOffset += lineNode.size[lineDirection] + spacing[lineDirection] + (justifyOffset * 2);
+    }
+    for (i = 0; i < lineNodes.length; i++) {
+      lineNode = next ? lineNodes[i] : lineNodes[(lineNodes.length - 1) - i];
+      context.set(lineNode.node, lineNode.set);
+    }
+    lineNodes = [];
+    return lineSize[direction] + spacing[direction];
+  }
+  function _resolveNodeSize(node) {
+    var localItemSize = itemSize;
+    if (getItemSize) {
+      localItemSize = getItemSize(node.renderNode, size);
+    }
+    if ((localItemSize[0] === true) || (localItemSize[1] === true)) {
+      var result = context.resolveSize(node, size);
+      if (localItemSize[0] !== true) {
+        result[0] = itemSize[0];
+      }
+      if (localItemSize[1] !== true) {
+        result[1] = itemSize[1];
+      }
+      return result;
+    } else {
+      return localItemSize;
+    }
+  }
+  function CollectionLayout(context_, options) {
+    context = context_;
+    size = context.size;
+    direction = context.direction;
+    alignment = context.alignment;
+    lineDirection = (direction + 1) % 2;
+    if ((options.gutter !== undefined) && console.warn && !options.suppressWarnings) {
+      console.warn('option `gutter` has been deprecated for CollectionLayout, use margins & spacing instead');
+    }
+    if (options.gutter && !options.margins && !options.spacing) {
+      var gutter = Array.isArray(options.gutter) ? options.gutter : [options.gutter, options.gutter];
+      margins = [gutter[1], gutter[0], gutter[1], gutter[0]];
+      spacing = gutter;
+    } else {
+      margins = LayoutUtility.normalizeMargins(options.margins);
+      spacing = options.spacing || 0;
+      spacing = Array.isArray(spacing) ? spacing : [spacing, spacing];
+    }
+    margin[0] = margins[direction ? 0 : 3];
+    margin[1] = -margins[direction ? 2 : 1];
+    justify = Array.isArray(options.justify) ? options.justify : (options.justify ? [true, true] : [false, false]);
+    lineLength = size[lineDirection] - (direction ? (margins[3] + margins[1]) : (margins[0] + margins[2]));
+    var node;
+    var nodeSize;
+    var lineOffset;
+    var bound;
+    if (options.cells) {
+      if (options.itemSize && console.warn && !options.suppressWarnings) {
+        console.warn('options `cells` and `itemSize` cannot both be specified for CollectionLayout, only use one of the two');
+      }
+      itemSize = [([undefined, true].indexOf(options.cells[0]) > -1) ? options.cells[0] : (size[0] - (margins[1] + margins[3] + (spacing[0] * (options.cells[0] - 1)))) / options.cells[0], ([undefined, true].indexOf(options.cells[1]) > -1) ? options.cells[1] : (size[1] - (margins[0] + margins[2] + (spacing[1] * (options.cells[1] - 1)))) / options.cells[1]];
+    } else if (!options.itemSize) {
+      itemSize = [true, true];
+    } else if (options.itemSize instanceof Function) {
+      getItemSize = options.itemSize;
+    } else if ((options.itemSize[0] === undefined) || (options.itemSize[0] === undefined)) {
+      itemSize = [(options.itemSize[0] === undefined) ? size[0] : options.itemSize[0], (options.itemSize[1] === undefined) ? size[1] : options.itemSize[1]];
+    } else {
+      itemSize = options.itemSize;
+    }
+    offset = context.scrollOffset + margin[alignment] + (alignment ? spacing[direction] : 0);
+    bound = context.scrollEnd + (alignment ? 0 : margin[alignment]);
+    lineOffset = 0;
+    lineNodes = [];
+    while (offset < bound) {
+      node = context.next();
+      if (!node) {
+        _layoutLine(true, true);
+        break;
+      }
+      nodeSize = _resolveNodeSize(node);
+      lineOffset += (lineNodes.length ? spacing[lineDirection] : 0) + nodeSize[lineDirection];
+      if ((Math.round(lineOffset * 100) / 100) > lineLength) {
+        offset += _layoutLine(true, !node);
+        lineOffset = nodeSize[lineDirection];
+      }
+      lineNodes.push({
+        node: node,
+        size: nodeSize
+      });
+    }
+    offset = context.scrollOffset + margin[alignment] - (alignment ? 0 : spacing[direction]);
+    bound = context.scrollStart + (alignment ? margin[alignment] : 0);
+    lineOffset = 0;
+    lineNodes = [];
+    while (offset > bound) {
+      node = context.prev();
+      if (!node) {
+        _layoutLine(false, true);
+        break;
+      }
+      nodeSize = _resolveNodeSize(node);
+      lineOffset += (lineNodes.length ? spacing[lineDirection] : 0) + nodeSize[lineDirection];
+      if ((Math.round(lineOffset * 100) / 100) > lineLength) {
+        offset -= _layoutLine(false, !node);
+        lineOffset = nodeSize[lineDirection];
+      }
+      lineNodes.unshift({
+        node: node,
+        size: nodeSize
+      });
+    }
+  }
+  CollectionLayout.Capabilities = capabilities;
+  CollectionLayout.Name = 'CollectionLayout';
+  CollectionLayout.Description = 'Multi-cell collection-layout with margins & spacing';
+  module.exports = CollectionLayout;
+});
+
+})();
+(function() {
+var define = $__System.amdDefine;
+define("13d", ["require", "exports", "module", "14a", "14b", "13f", "148"], function(require, exports, module) {
+  var EventHandler = require('14a');
+  var OptionsManager = require('14b');
   var RenderNode = require('13f');
-  var Utility = require('149');
+  var Utility = require('148');
   function View(options) {
     this._node = new RenderNode();
     this._eventInput = new EventHandler();
@@ -35985,7 +36161,7 @@ define("13d", ["require", "exports", "module", "147", "148", "13f", "149"], func
 })();
 (function() {
 var define = $__System.amdDefine;
-define("14a", ["require", "exports", "module", "146"], function(require, exports, module) {
+define("14c", ["require", "exports", "module", "146"], function(require, exports, module) {
   var Surface = require('146');
   function ImageSurface(options) {
     this._imageUrl = undefined;
@@ -36054,7 +36230,7 @@ define("14a", ["require", "exports", "module", "146"], function(require, exports
 });
 
 })();
-$__System.registerDynamic('14b', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('14d', [], true, function ($__require, exports, module) {
   /*jshint browserify: true, es3: true */
   'use strict';
 
@@ -36283,7 +36459,7 @@ $__System.registerDynamic('14b', [], true, function ($__require, exports, module
 });
 (function() {
 var define = $__System.amdDefine;
-define("14c", ["require", "exports", "module"], function(require, exports, module) {
+define("14e", ["require", "exports", "module"], function(require, exports, module) {
   var Utilities = {};
   Utilities.clamp = function clamp(value, range) {
     return Math.max(Math.min(value, range[1]), range[0]);
@@ -36301,14 +36477,14 @@ define("14c", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("14d", ["require", "exports", "module", "139", "13a", "147", "14c", "14e", "14f", "150"], function(require, exports, module) {
+define("14f", ["require", "exports", "module", "139", "13a", "14a", "14e", "150", "151", "152"], function(require, exports, module) {
   var Transform = require('139');
   var Transitionable = require('13a');
-  var EventHandler = require('147');
-  var Utilities = require('14c');
-  var GenericSync = require('14e');
-  var MouseSync = require('14f');
-  var TouchSync = require('150');
+  var EventHandler = require('14a');
+  var Utilities = require('14e');
+  var GenericSync = require('150');
+  var MouseSync = require('151');
+  var TouchSync = require('152');
   GenericSync.register({
     'mouse': MouseSync,
     'touch': TouchSync
@@ -36472,9 +36648,9 @@ define("14d", ["require", "exports", "module", "139", "13a", "147", "14c", "14e"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("151", ["require", "exports", "module", "146", "152"], function(require, exports, module) {
+define("153", ["require", "exports", "module", "146", "154"], function(require, exports, module) {
   var Surface = require('146');
-  var Context = require('152');
+  var Context = require('154');
   function ContainerSurface(options) {
     Surface.call(this, options);
     this._container = document.createElement('div');
@@ -36516,8 +36692,8 @@ define("151", ["require", "exports", "module", "146", "152"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("140", ["require", "exports", "module", "153"], function(require, exports, module) {
-  var FamousEngine = require('153');
+define("140", ["require", "exports", "module", "155"], function(require, exports, module) {
+  var FamousEngine = require('155');
   var _event = 'prerender';
   var getTime = (window.performance && window.performance.now) ? function() {
     return window.performance.now();
@@ -36614,8 +36790,8 @@ define("140", ["require", "exports", "module", "153"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("14e", ["require", "exports", "module", "147"], function(require, exports, module) {
-  var EventHandler = require('147');
+define("150", ["require", "exports", "module", "14a"], function(require, exports, module) {
+  var EventHandler = require('14a');
   function GenericSync(syncs, options) {
     this._eventInput = new EventHandler();
     this._eventOutput = new EventHandler();
@@ -36675,9 +36851,9 @@ define("14e", ["require", "exports", "module", "147"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("14f", ["require", "exports", "module", "147", "148"], function(require, exports, module) {
-  var EventHandler = require('147');
-  var OptionsManager = require('148');
+define("151", ["require", "exports", "module", "14a", "14b"], function(require, exports, module) {
+  var EventHandler = require('14a');
+  var OptionsManager = require('14b');
   function MouseSync(options) {
     this.options = Object.create(MouseSync.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
@@ -36864,8 +37040,8 @@ define("14f", ["require", "exports", "module", "147", "148"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("154", ["require", "exports", "module", "147"], function(require, exports, module) {
-  var EventHandler = require('147');
+define("156", ["require", "exports", "module", "14a"], function(require, exports, module) {
+  var EventHandler = require('14a');
   var _now = Date.now;
   function _timestampTouch(touch, event, history) {
     return {
@@ -36953,10 +37129,10 @@ define("154", ["require", "exports", "module", "147"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("150", ["require", "exports", "module", "154", "147", "148"], function(require, exports, module) {
-  var TouchTracker = require('154');
-  var EventHandler = require('147');
-  var OptionsManager = require('148');
+define("152", ["require", "exports", "module", "156", "14a", "14b"], function(require, exports, module) {
+  var TouchTracker = require('156');
+  var EventHandler = require('14a');
+  var OptionsManager = require('14b');
   function TouchSync(options) {
     this.options = Object.create(TouchSync.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
@@ -37079,10 +37255,10 @@ define("150", ["require", "exports", "module", "154", "147", "148"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13b", ["require", "exports", "module", "13a", "139", "149"], function(require, exports, module) {
+define("13b", ["require", "exports", "module", "13a", "139", "148"], function(require, exports, module) {
   var Transitionable = require('13a');
   var Transform = require('139');
-  var Utility = require('149');
+  var Utility = require('148');
   function TransitionableTransform(transform) {
     this._final = Transform.identity.slice();
     this._finalTranslate = [0, 0, 0];
@@ -37425,7 +37601,7 @@ define("138", ["require", "exports", "module", "139", "13a", "13b"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("155", ["require", "exports", "module"], function(require, exports, module) {
+define("157", ["require", "exports", "module"], function(require, exports, module) {
   function ViewSequence(options) {
     if (!options)
       options = [];
@@ -37663,8 +37839,8 @@ define("155", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("156", ["require", "exports", "module", "157"], function(require, exports, module) {
-  var LayoutUtility = require('157');
+define("158", ["require", "exports", "module", "149"], function(require, exports, module) {
+  var LayoutUtility = require('149');
   function LayoutDockHelper(context, options) {
     var size = context.size;
     this._size = size;
@@ -37800,19 +37976,19 @@ define("156", ["require", "exports", "module", "157"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13e", ["require", "exports", "module", "149", "158", "155", "159", "148", "147", "157", "15a", "15b", "15c", "139", "156"], function(require, exports, module) {
-  var Utility = require('149');
-  var Entity = require('158');
-  var ViewSequence = require('155');
-  var LinkedListViewSequence = require('159');
-  var OptionsManager = require('148');
-  var EventHandler = require('147');
-  var LayoutUtility = require('157');
-  var LayoutNodeManager = require('15a');
-  var LayoutNode = require('15b');
-  var FlowLayoutNode = require('15c');
+define("13e", ["require", "exports", "module", "148", "159", "157", "15a", "14b", "14a", "149", "15b", "15c", "15d", "139", "158"], function(require, exports, module) {
+  var Utility = require('148');
+  var Entity = require('159');
+  var ViewSequence = require('157');
+  var LinkedListViewSequence = require('15a');
+  var OptionsManager = require('14b');
+  var EventHandler = require('14a');
+  var LayoutUtility = require('149');
+  var LayoutNodeManager = require('15b');
+  var LayoutNode = require('15c');
+  var FlowLayoutNode = require('15d');
   var Transform = require('139');
-  require('156');
+  require('158');
   function LayoutController(options, nodeManager) {
     this.id = Entity.register(this);
     this._isDirty = true;
@@ -38412,7 +38588,7 @@ define("13e", ["require", "exports", "module", "149", "158", "155", "159", "148"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("15d", ["require", "exports", "module"], function(require, exports, module) {
+define("15e", ["require", "exports", "module"], function(require, exports, module) {
   function LayoutContext(methods) {
     for (var n in methods) {
       this[n] = methods[n];
@@ -38432,7 +38608,7 @@ define("15d", ["require", "exports", "module"], function(require, exports, modul
 });
 
 })();
-$__System.registerDynamic('15e', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('15f', [], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
@@ -38470,7 +38646,7 @@ $__System.registerDynamic('15e', [], true, function ($__require, exports, module
 	};
 	return module.exports;
 });
-$__System.registerDynamic('15f', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('160', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -38484,7 +38660,7 @@ $__System.registerDynamic('15f', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('160', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('161', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -38498,24 +38674,24 @@ $__System.registerDynamic('160', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('161', ['15f', '160', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('162', ['160', '161', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('15f')() ? Math.sign : $__require('160');
+	module.exports = $__require('160')() ? Math.sign : $__require('161');
 	return module.exports;
 });
-$__System.registerDynamic('162', ['161', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('163', ['162', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var sign = $__require('161'),
+	var sign = $__require('162'),
 	    abs = Math.abs,
 	    floor = Math.floor;
 
@@ -38527,14 +38703,14 @@ $__System.registerDynamic('162', ['161', '5'], true, function ($__require, expor
 	};
 	return module.exports;
 });
-$__System.registerDynamic('163', ['162', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('164', ['163', '5'], true, function ($__require, exports, module) {
   'use strict';
 
   var process = $__require('5');
   var define,
       global = this || self,
       GLOBAL = global;
-  var toInteger = $__require('162'),
+  var toInteger = $__require('163'),
       max = Math.max;
 
   module.exports = function (value) {
@@ -38542,15 +38718,15 @@ $__System.registerDynamic('163', ['162', '5'], true, function ($__require, expor
   };
   return module.exports;
 });
-$__System.registerDynamic('164', ['163', '165', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('165', ['164', '166', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var toPosInt = $__require('163'),
-	    value = $__require('165'),
+	var toPosInt = $__require('164'),
+	    value = $__require('166'),
 	    indexOf = Array.prototype.indexOf,
 	    hasOwnProperty = Object.prototype.hasOwnProperty,
 	    abs = Math.abs,
@@ -38577,14 +38753,14 @@ $__System.registerDynamic('164', ['163', '165', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('166', ['167', '168'], true, function ($__require, exports, module) {
+$__System.registerDynamic('167', ['168', '169'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var d = $__require('167'),
-	    callable = $__require('168'),
+	var d = $__require('168'),
+	    callable = $__require('169'),
 	    apply = Function.prototype.apply,
 	    call = Function.prototype.call,
 	    create = Object.create,
@@ -38716,16 +38892,16 @@ $__System.registerDynamic('166', ['167', '168'], true, function ($__require, exp
 	exports.methods = methods;
 	return module.exports;
 });
-$__System.registerDynamic('169', ['16b', '16c', '167', '16a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16a', ['16c', '16d', '168', '16b'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var setPrototypeOf = $__require('16b'),
-	    contains = $__require('16c'),
-	    d = $__require('167'),
-	    Iterator = $__require('16a'),
+	var setPrototypeOf = $__require('16c'),
+	    contains = $__require('16d'),
+	    d = $__require('168'),
+	    Iterator = $__require('16b'),
 	    defineProperty = Object.defineProperty,
 	    ArrayIterator;
 
@@ -38750,7 +38926,7 @@ $__System.registerDynamic('169', ['16b', '16c', '167', '16a'], true, function ($
 	});
 	return module.exports;
 });
-$__System.registerDynamic('16d', ['16b', '167', '16a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16e', ['16c', '168', '16b'], true, function ($__require, exports, module) {
 	// Thanks @mathiasbynens
 	// http://mathiasbynens.be/notes/javascript-unicode#iterating-over-symbols
 
@@ -38759,9 +38935,9 @@ $__System.registerDynamic('16d', ['16b', '167', '16a'], true, function ($__requi
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var setPrototypeOf = $__require('16b'),
-	    d = $__require('167'),
-	    Iterator = $__require('16a'),
+	var setPrototypeOf = $__require('16c'),
+	    d = $__require('168'),
+	    Iterator = $__require('16b'),
 	    defineProperty = Object.defineProperty,
 	    StringIterator;
 
@@ -38794,7 +38970,7 @@ $__System.registerDynamic('16d', ['16b', '167', '16a'], true, function ($__requi
 	});
 	return module.exports;
 });
-$__System.registerDynamic('16e', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16f', ['5'], true, function ($__require, exports, module) {
   'use strict';
 
   var process = $__require('5');
@@ -38811,7 +38987,7 @@ $__System.registerDynamic('16e', ['5'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic('16f', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('170', ['5'], true, function ($__require, exports, module) {
 		'use strict';
 
 		var process = $__require('5');
@@ -38826,15 +39002,15 @@ $__System.registerDynamic('16f', ['5'], true, function ($__require, exports, mod
 		};
 		return module.exports;
 });
-$__System.registerDynamic('170', ['16e', '16f', '171'], true, function ($__require, exports, module) {
+$__System.registerDynamic('171', ['16f', '170', '172'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isArguments = $__require('16e'),
-	    isString = $__require('16f'),
-	    iteratorSymbol = $__require('171').iterator,
+	var isArguments = $__require('16f'),
+	    isString = $__require('170'),
+	    iteratorSymbol = $__require('172').iterator,
 	    isArray = Array.isArray;
 
 	module.exports = function (value) {
@@ -38846,13 +39022,13 @@ $__System.registerDynamic('170', ['16e', '16f', '171'], true, function ($__requi
 	};
 	return module.exports;
 });
-$__System.registerDynamic('172', ['170'], true, function ($__require, exports, module) {
+$__System.registerDynamic('173', ['171'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isIterable = $__require('170');
+	var isIterable = $__require('171');
 
 	module.exports = function (value) {
 		if (!isIterable(value)) throw new TypeError(value + " is not iterable");
@@ -38860,18 +39036,18 @@ $__System.registerDynamic('172', ['170'], true, function ($__require, exports, m
 	};
 	return module.exports;
 });
-$__System.registerDynamic('173', ['16e', '16f', '169', '16d', '172', '171'], true, function ($__require, exports, module) {
+$__System.registerDynamic('174', ['16f', '170', '16a', '16e', '173', '172'], true, function ($__require, exports, module) {
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  var isArguments = $__require('16e'),
-      isString = $__require('16f'),
-      ArrayIterator = $__require('169'),
-      StringIterator = $__require('16d'),
-      iterable = $__require('172'),
-      iteratorSymbol = $__require('171').iterator;
+  var isArguments = $__require('16f'),
+      isString = $__require('170'),
+      ArrayIterator = $__require('16a'),
+      StringIterator = $__require('16e'),
+      iterable = $__require('173'),
+      iteratorSymbol = $__require('172').iterator;
 
   module.exports = function (obj) {
     if (typeof iterable(obj)[iteratorSymbol] === 'function') return obj[iteratorSymbol]();
@@ -38881,16 +39057,16 @@ $__System.registerDynamic('173', ['16e', '16f', '169', '16d', '172', '171'], tru
   };
   return module.exports;
 });
-$__System.registerDynamic('174', ['16e', '168', '16f', '173'], true, function ($__require, exports, module) {
+$__System.registerDynamic('175', ['16f', '169', '170', '174'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isArguments = $__require('16e'),
-	    callable = $__require('168'),
-	    isString = $__require('16f'),
-	    get = $__require('173'),
+	var isArguments = $__require('16f'),
+	    callable = $__require('169'),
+	    isString = $__require('170'),
+	    get = $__require('174'),
 	    isArray = Array.isArray,
 	    call = Function.prototype.call,
 	    some = Array.prototype.some;
@@ -38941,7 +39117,7 @@ $__System.registerDynamic('174', ['16e', '168', '16f', '173'], true, function ($
 	};
 	return module.exports;
 });
-$__System.registerDynamic('175', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('176', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -38955,7 +39131,7 @@ $__System.registerDynamic('175', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('176', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('177', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -38974,7 +39150,7 @@ $__System.registerDynamic('176', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('177', ['176', '178', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('178', ['177', '179', '5'], true, function ($__require, exports, module) {
 	// Workaround for http://code.google.com/p/v8/issues/detail?id=2804
 
 	'use strict';
@@ -38986,8 +39162,8 @@ $__System.registerDynamic('177', ['176', '178', '5'], true, function ($__require
 	var create = Object.create,
 	    shim;
 
-	if (!$__require('176')()) {
-		shim = $__require('178');
+	if (!$__require('177')()) {
+		shim = $__require('179');
 	}
 
 	module.exports = function () {
@@ -39018,7 +39194,7 @@ $__System.registerDynamic('177', ['176', '178', '5'], true, function ($__require
 	}();
 	return module.exports;
 });
-$__System.registerDynamic('178', ['175', '165', '177', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('179', ['176', '166', '178', '5'], true, function ($__require, exports, module) {
 	// Big thanks to @WebReflection for sorting this out
 	// https://gist.github.com/WebReflection/5593554
 
@@ -39028,8 +39204,8 @@ $__System.registerDynamic('178', ['175', '165', '177', '5'], true, function ($__
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isObject = $__require('175'),
-	    value = $__require('165'),
+	var isObject = $__require('176'),
+	    value = $__require('166'),
 	    isPrototypeOf = Object.prototype.isPrototypeOf,
 	    defineProperty = Object.defineProperty,
 	    nullDesc = { configurable: true, enumerable: false, writable: true,
@@ -39096,20 +39272,20 @@ $__System.registerDynamic('178', ['175', '165', '177', '5'], true, function ($__
 		return false;
 	}());
 
-	$__require('177');
+	$__require('178');
 	return module.exports;
 });
-$__System.registerDynamic('16b', ['176', '178', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16c', ['177', '179', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('176')() ? Object.setPrototypeOf : $__require('178');
+	module.exports = $__require('177')() ? Object.setPrototypeOf : $__require('179');
 	return module.exports;
 });
-$__System.registerDynamic('179', ['165', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17a', ['166', '5'], true, function ($__require, exports, module) {
 	// Inspired by Google Closure:
 	// http://closure-library.googlecode.com/svn/docs/
 	// closure_goog_array_array.js.html#goog.array.clear
@@ -39120,7 +39296,7 @@ $__System.registerDynamic('179', ['165', '5'], true, function ($__require, expor
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var value = $__require('165');
+	var value = $__require('166');
 
 	module.exports = function () {
 		value(this).length = 0;
@@ -39128,15 +39304,15 @@ $__System.registerDynamic('179', ['165', '5'], true, function ($__require, expor
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17a', ['17b', '165', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17b', ['17c', '166', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var assign = $__require('17b'),
-	    value = $__require('165');
+	var assign = $__require('17c'),
+	    value = $__require('166');
 
 	module.exports = function (obj) {
 		var copy = Object(value(obj));
@@ -39145,7 +39321,7 @@ $__System.registerDynamic('17a', ['17b', '165', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17c', ['168', '165', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17d', ['169', '166', '5'], true, function ($__require, exports, module) {
 	// Internal method, used by iteration functions.
 	// Calls a function for each key-value pair found in object
 	// Optionally takes compareFn to iterate object in specific order
@@ -39156,8 +39332,8 @@ $__System.registerDynamic('17c', ['168', '165', '5'], true, function ($__require
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var callable = $__require('168'),
-	    value = $__require('165'),
+	var callable = $__require('169'),
+	    value = $__require('166'),
 	    bind = Function.prototype.bind,
 	    call = Function.prototype.call,
 	    keys = Object.keys,
@@ -39184,25 +39360,25 @@ $__System.registerDynamic('17c', ['168', '165', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17d', ['17c', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17e', ['17d', '5'], true, function ($__require, exports, module) {
   'use strict';
 
   var process = $__require('5');
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require('17c')('forEach');
+  module.exports = $__require('17d')('forEach');
   return module.exports;
 });
-$__System.registerDynamic('17e', ['168', '17d', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17f', ['169', '17e', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var callable = $__require('168'),
-	    forEach = $__require('17d'),
+	var callable = $__require('169'),
+	    forEach = $__require('17e'),
 	    call = Function.prototype.call;
 
 	module.exports = function (obj, cb /*, thisArg*/) {
@@ -39216,7 +39392,7 @@ $__System.registerDynamic('17e', ['168', '17d', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('168', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('169', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39229,16 +39405,16 @@ $__System.registerDynamic('168', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17f', ['17a', '17e', '168', '165'], true, function ($__require, exports, module) {
+$__System.registerDynamic('180', ['17b', '17f', '169', '166'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var copy = $__require('17a'),
-	    map = $__require('17e'),
-	    callable = $__require('168'),
-	    validValue = $__require('165'),
+	var copy = $__require('17b'),
+	    map = $__require('17f'),
+	    callable = $__require('169'),
+	    validValue = $__require('166'),
 	    bind = Function.prototype.bind,
 	    defineProperty = Object.defineProperty,
 	    hasOwnProperty = Object.prototype.hasOwnProperty,
@@ -39267,19 +39443,19 @@ $__System.registerDynamic('17f', ['17a', '17e', '168', '165'], true, function ($
 	};
 	return module.exports;
 });
-$__System.registerDynamic('16a', ['179', '17b', '168', '165', '167', '17f', '171'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16b', ['17a', '17c', '169', '166', '168', '180', '172'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var clear = $__require('179'),
-	    assign = $__require('17b'),
-	    callable = $__require('168'),
-	    value = $__require('165'),
-	    d = $__require('167'),
-	    autoBind = $__require('17f'),
-	    Symbol = $__require('171'),
+	var clear = $__require('17a'),
+	    assign = $__require('17c'),
+	    callable = $__require('169'),
+	    value = $__require('166'),
+	    d = $__require('168'),
+	    autoBind = $__require('180'),
+	    Symbol = $__require('172'),
 	    defineProperty = Object.defineProperty,
 	    defineProperties = Object.defineProperties,
 	    Iterator;
@@ -39368,7 +39544,7 @@ $__System.registerDynamic('16a', ['179', '17b', '168', '165', '167', '17f', '171
 	defineProperty(Iterator.prototype, Symbol.toStringTag, d('', 'Iterator'));
 	return module.exports;
 });
-$__System.registerDynamic('180', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('181', [], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
@@ -39395,7 +39571,7 @@ $__System.registerDynamic('180', [], true, function ($__require, exports, module
 	};
 	return module.exports;
 });
-$__System.registerDynamic('181', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('182', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39412,7 +39588,7 @@ $__System.registerDynamic('181', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('182', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('183', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39429,7 +39605,7 @@ $__System.registerDynamic('182', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('183', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('184', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39443,17 +39619,17 @@ $__System.registerDynamic('183', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('184', ['182', '183', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('185', ['183', '184', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('182')() ? Object.keys : $__require('183');
+	module.exports = $__require('183')() ? Object.keys : $__require('184');
 	return module.exports;
 });
-$__System.registerDynamic("165", ["5"], true, function ($__require, exports, module) {
+$__System.registerDynamic("166", ["5"], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require("5");
@@ -39466,15 +39642,15 @@ $__System.registerDynamic("165", ["5"], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('185', ['184', '165', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('186', ['185', '166', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var keys = $__require('184'),
-	    value = $__require('165'),
+	var keys = $__require('185'),
+	    value = $__require('166'),
 	    max = Math.max;
 
 	module.exports = function (dest, src /*, …srcn*/) {
@@ -39499,17 +39675,17 @@ $__System.registerDynamic('185', ['184', '165', '5'], true, function ($__require
 	};
 	return module.exports;
 });
-$__System.registerDynamic('17b', ['181', '185', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('17c', ['182', '186', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('181')() ? Object.assign : $__require('185');
+	module.exports = $__require('182')() ? Object.assign : $__require('186');
 	return module.exports;
 });
-$__System.registerDynamic('186', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('187', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39534,7 +39710,7 @@ $__System.registerDynamic('186', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('187', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('188', ['5'], true, function ($__require, exports, module) {
   // Deprecated
 
   'use strict';
@@ -39548,7 +39724,7 @@ $__System.registerDynamic('187', ['5'], true, function ($__require, exports, mod
   };
   return module.exports;
 });
-$__System.registerDynamic('188', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('189', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39563,7 +39739,7 @@ $__System.registerDynamic('188', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('189', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18a', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39577,26 +39753,26 @@ $__System.registerDynamic('189', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('16c', ['188', '189', '5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('16d', ['189', '18a', '5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('188')() ? String.prototype.contains : $__require('189');
+	module.exports = $__require('189')() ? String.prototype.contains : $__require('18a');
 	return module.exports;
 });
-$__System.registerDynamic('167', ['17b', '186', '187', '16c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('168', ['17c', '187', '188', '16d'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var assign = $__require('17b'),
-	    normalizeOpts = $__require('186'),
-	    isCallable = $__require('187'),
-	    contains = $__require('16c'),
+	var assign = $__require('17c'),
+	    normalizeOpts = $__require('187'),
+	    isCallable = $__require('188'),
+	    contains = $__require('16d'),
 	    d;
 
 	d = module.exports = function (dscr, value /*, options*/) {
@@ -39655,7 +39831,7 @@ $__System.registerDynamic('167', ['17b', '186', '187', '16c'], true, function ($
 	};
 	return module.exports;
 });
-$__System.registerDynamic('18a', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('18b', [], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
@@ -39670,13 +39846,13 @@ $__System.registerDynamic('18a', [], true, function ($__require, exports, module
 	};
 	return module.exports;
 });
-$__System.registerDynamic('18b', ['18a'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18c', ['18b'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var isSymbol = $__require('18a');
+	var isSymbol = $__require('18b');
 
 	module.exports = function (value) {
 		if (!isSymbol(value)) throw new TypeError(value + " is not a symbol");
@@ -39684,7 +39860,7 @@ $__System.registerDynamic('18b', ['18a'], true, function ($__require, exports, m
 	};
 	return module.exports;
 });
-$__System.registerDynamic('18c', ['167', '18b'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18d', ['168', '18c'], true, function ($__require, exports, module) {
 	// ES2015 Symbol polyfill for environments that do not support it (or partially support it)
 
 	'use strict';
@@ -39692,8 +39868,8 @@ $__System.registerDynamic('18c', ['167', '18b'], true, function ($__require, exp
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var d = $__require('167'),
-	    validateSymbol = $__require('18b'),
+	var d = $__require('168'),
+	    validateSymbol = $__require('18c'),
 	    create = Object.create,
 	    defineProperties = Object.defineProperties,
 	    defineProperty = Object.defineProperty,
@@ -39817,13 +39993,13 @@ $__System.registerDynamic('18c', ['167', '18b'], true, function ($__require, exp
 	defineProperty(HiddenSymbol.prototype, SymbolPolyfill.toPrimitive, d('c', SymbolPolyfill.prototype[SymbolPolyfill.toPrimitive]));
 	return module.exports;
 });
-$__System.registerDynamic('171', ['180', '18c'], true, function ($__require, exports, module) {
+$__System.registerDynamic('172', ['181', '18d'], true, function ($__require, exports, module) {
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require('180')() ? Symbol : $__require('18c');
+  module.exports = $__require('181')() ? Symbol : $__require('18d');
   return module.exports;
 });
 $__System.registerDynamic("@system-env", [], false, function() {
@@ -39938,7 +40114,7 @@ $__System.registerDynamic('5', ['@system-env'], true, function ($__require, expo
     };
     return module.exports;
 });
-$__System.registerDynamic('18d', ['5'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18e', ['5'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var process = $__require('5');
@@ -39957,26 +40133,26 @@ $__System.registerDynamic('18d', ['5'], true, function ($__require, exports, mod
 	};
 	return module.exports;
 });
-$__System.registerDynamic('18e', ['18d'], true, function ($__require, exports, module) {
+$__System.registerDynamic('18f', ['18e'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	module.exports = $__require('18d')('key', 'value', 'key+value');
+	module.exports = $__require('18e')('key', 'value', 'key+value');
 	return module.exports;
 });
-$__System.registerDynamic('18f', ['16b', '167', '16a', '171', '18e'], true, function ($__require, exports, module) {
+$__System.registerDynamic('190', ['16c', '168', '16b', '172', '18f'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var setPrototypeOf = $__require('16b'),
-	    d = $__require('167'),
-	    Iterator = $__require('16a'),
-	    toStringTagSymbol = $__require('171').toStringTag,
-	    kinds = $__require('18e'),
+	var setPrototypeOf = $__require('16c'),
+	    d = $__require('168'),
+	    Iterator = $__require('16b'),
+	    toStringTagSymbol = $__require('172').toStringTag,
+	    kinds = $__require('18f'),
 	    defineProperties = Object.defineProperties,
 	    unBind = Iterator.prototype._unBind,
 	    MapIterator;
@@ -40010,7 +40186,7 @@ $__System.registerDynamic('18f', ['16b', '167', '16a', '171', '18e'], true, func
 	Object.defineProperty(MapIterator.prototype, toStringTagSymbol, d('c', 'Map Iterator'));
 	return module.exports;
 });
-$__System.registerDynamic('190', [], true, function ($__require, exports, module) {
+$__System.registerDynamic('191', [], true, function ($__require, exports, module) {
 	// Exports true if environment provides native `Map` implementation,
 	// whatever that is.
 
@@ -40025,24 +40201,24 @@ $__System.registerDynamic('190', [], true, function ($__require, exports, module
 	}();
 	return module.exports;
 });
-$__System.registerDynamic('191', ['179', '164', '16b', '168', '165', '167', '166', '171', '172', '174', '18f', '190'], true, function ($__require, exports, module) {
+$__System.registerDynamic('192', ['17a', '165', '16c', '169', '166', '168', '167', '172', '173', '175', '190', '191'], true, function ($__require, exports, module) {
 	'use strict';
 
 	var define,
 	    global = this || self,
 	    GLOBAL = global;
-	var clear = $__require('179'),
-	    eIndexOf = $__require('164'),
-	    setPrototypeOf = $__require('16b'),
-	    callable = $__require('168'),
-	    validValue = $__require('165'),
-	    d = $__require('167'),
-	    ee = $__require('166'),
-	    Symbol = $__require('171'),
-	    iterator = $__require('172'),
-	    forOf = $__require('174'),
-	    Iterator = $__require('18f'),
-	    isNative = $__require('190'),
+	var clear = $__require('17a'),
+	    eIndexOf = $__require('165'),
+	    setPrototypeOf = $__require('16c'),
+	    callable = $__require('169'),
+	    validValue = $__require('166'),
+	    d = $__require('168'),
+	    ee = $__require('167'),
+	    Symbol = $__require('172'),
+	    iterator = $__require('173'),
+	    forOf = $__require('175'),
+	    Iterator = $__require('190'),
+	    isNative = $__require('191'),
 	    call = Function.prototype.call,
 	    defineProperties = Object.defineProperties,
 	    getPrototypeOf = Object.getPrototypeOf,
@@ -40150,13 +40326,13 @@ $__System.registerDynamic('191', ['179', '164', '16b', '168', '165', '167', '166
 	Object.defineProperty(MapPoly.prototype, Symbol.toStringTag, d('c', 'Map'));
 	return module.exports;
 });
-$__System.registerDynamic('192', ['15e', '191'], true, function ($__require, exports, module) {
+$__System.registerDynamic('193', ['15f', '192'], true, function ($__require, exports, module) {
   'use strict';
 
   var define,
       global = this || self,
       GLOBAL = global;
-  module.exports = $__require('15e')() ? Map : $__require('191');
+  module.exports = $__require('15f')() ? Map : $__require('192');
   return module.exports;
 });
 (function() {
@@ -40326,14 +40502,14 @@ define("141", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("15c", ["require", "exports", "module", "148", "139", "193", "194", "195", "196", "15b", "13a", "141"], function(require, exports, module) {
-  var OptionsManager = require('148');
+define("15d", ["require", "exports", "module", "14b", "139", "194", "195", "196", "197", "15c", "13a", "141"], function(require, exports, module) {
+  var OptionsManager = require('14b');
   var Transform = require('139');
-  var Vector = require('193');
-  var Particle = require('194');
-  var Spring = require('195');
-  var PhysicsEngine = require('196');
-  var LayoutNode = require('15b');
+  var Vector = require('194');
+  var Particle = require('195');
+  var Spring = require('196');
+  var PhysicsEngine = require('197');
+  var LayoutNode = require('15c');
   var Transitionable = require('13a');
   var Easing = require('141');
   function FlowLayoutNode(renderNode, spec) {
@@ -40848,9 +41024,9 @@ define("15c", ["require", "exports", "module", "148", "139", "193", "194", "195"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("15b", ["require", "exports", "module", "139", "157"], function(require, exports, module) {
+define("15c", ["require", "exports", "module", "139", "149"], function(require, exports, module) {
   var Transform = require('139');
-  var LayoutUtility = require('157');
+  var LayoutUtility = require('149');
   function LayoutNode(renderNode, spec) {
     this.renderNode = renderNode;
     this._spec = spec ? LayoutUtility.cloneSpec(spec) : {};
@@ -40976,14 +41152,14 @@ define("15b", ["require", "exports", "module", "139", "157"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("15a", ["require", "exports", "module", "15d", "192", "157", "146", "13f", "15c", "15b"], function(require, exports, module) {
-  var LayoutContext = require('15d');
-  var Map = require('192');
-  var LayoutUtility = require('157');
+define("15b", ["require", "exports", "module", "15e", "193", "149", "146", "13f", "15d", "15c"], function(require, exports, module) {
+  var LayoutContext = require('15e');
+  var Map = require('193');
+  var LayoutUtility = require('149');
   var Surface = require('146');
   var RenderNode = require('13f');
-  var FlowLayoutNode = require('15c');
-  var LayoutNode = require('15b');
+  var FlowLayoutNode = require('15d');
+  var LayoutNode = require('15c');
   var MAX_POOL_SIZE = 100;
   function LayoutNodeManager(LayoutNode, initLayoutNodeFn, partialFlow) {
     this.LayoutNode = LayoutNode;
@@ -41508,9 +41684,9 @@ define("15a", ["require", "exports", "module", "15d", "192", "157", "146", "13f"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("197", ["require", "exports", "module", "146", "152"], function(require, exports, module) {
+define("198", ["require", "exports", "module", "146", "154"], function(require, exports, module) {
   var Surface = require('146');
-  var Context = require('152');
+  var Context = require('154');
   function ContainerSurface(options) {
     Surface.call(this, options);
     this._container = document.createElement('div');
@@ -41552,9 +41728,9 @@ define("197", ["require", "exports", "module", "146", "152"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("198", ["require", "exports", "module", "158", "147", "139"], function(require, exports, module) {
-  var Entity = require('158');
-  var EventHandler = require('147');
+define("199", ["require", "exports", "module", "159", "14a", "139"], function(require, exports, module) {
+  var Entity = require('159');
+  var EventHandler = require('14a');
   var Transform = require('139');
   var usePrefix = !('transform' in document.documentElement.style);
   var devicePixelRatio = window.devicePixelRatio || 1;
@@ -41726,8 +41902,8 @@ define("198", ["require", "exports", "module", "158", "147", "139"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("146", ["require", "exports", "module", "198"], function(require, exports, module) {
-  var ElementOutput = require('198');
+define("146", ["require", "exports", "module", "199"], function(require, exports, module) {
+  var ElementOutput = require('199');
   function Surface(options) {
     ElementOutput.call(this);
     this.options = {};
@@ -42031,8 +42207,8 @@ define("146", ["require", "exports", "module", "198"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("199", ["require", "exports", "module", "152", "139", "146"], function(require, exports, module) {
-  var Context = require('152');
+define("19a", ["require", "exports", "module", "154", "139", "146"], function(require, exports, module) {
+  var Context = require('154');
   var Transform = require('139');
   var Surface = require('146');
   function Group(options) {
@@ -42090,8 +42266,8 @@ define("199", ["require", "exports", "module", "152", "139", "146"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("196", ["require", "exports", "module", "147"], function(require, exports, module) {
-  var EventHandler = require('147');
+define("197", ["require", "exports", "module", "14a"], function(require, exports, module) {
+  var EventHandler = require('14a');
   function PhysicsEngine(options) {
     this.options = Object.create(PhysicsEngine.DEFAULT_OPTIONS);
     if (options)
@@ -42365,7 +42541,7 @@ define("196", ["require", "exports", "module", "147"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19a", ["require", "exports", "module"], function(require, exports, module) {
+define("19b", ["require", "exports", "module"], function(require, exports, module) {
   var SymplecticEuler = {};
   SymplecticEuler.integrateVelocity = function integrateVelocity(body, dt) {
     var v = body.velocity;
@@ -42402,11 +42578,11 @@ define("19a", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("194", ["require", "exports", "module", "193", "139", "147", "19a"], function(require, exports, module) {
-  var Vector = require('193');
+define("195", ["require", "exports", "module", "194", "139", "14a", "19b"], function(require, exports, module) {
+  var Vector = require('194');
   var Transform = require('139');
-  var EventHandler = require('147');
-  var Integrator = require('19a');
+  var EventHandler = require('14a');
+  var Integrator = require('19b');
   function Particle(options) {
     options = options || {};
     var defaults = Particle.DEFAULT_OPTIONS;
@@ -42578,8 +42754,8 @@ define("194", ["require", "exports", "module", "193", "139", "147", "19a"], func
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19b", ["require", "exports", "module", "19c"], function(require, exports, module) {
-  var Force = require('19c');
+define("19c", ["require", "exports", "module", "19d"], function(require, exports, module) {
+  var Force = require('19d');
   function Drag(options) {
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
     if (options)
@@ -42622,9 +42798,9 @@ define("19b", ["require", "exports", "module", "19c"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19c", ["require", "exports", "module", "193", "147"], function(require, exports, module) {
-  var Vector = require('193');
-  var EventHandler = require('147');
+define("19d", ["require", "exports", "module", "194", "14a"], function(require, exports, module) {
+  var Vector = require('194');
+  var EventHandler = require('14a');
   function Force(force) {
     this.force = new Vector(force);
     this._eventOutput = new EventHandler();
@@ -42648,7 +42824,7 @@ define("19c", ["require", "exports", "module", "193", "147"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("193", ["require", "exports", "module"], function(require, exports, module) {
+define("194", ["require", "exports", "module"], function(require, exports, module) {
   function Vector(x, y, z) {
     if (arguments.length === 1 && x !== undefined)
       this.set(x);
@@ -42797,9 +42973,9 @@ define("193", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("195", ["require", "exports", "module", "19c", "193"], function(require, exports, module) {
-  var Force = require('19c');
-  var Vector = require('193');
+define("196", ["require", "exports", "module", "19d", "194"], function(require, exports, module) {
+  var Force = require('19d');
+  var Vector = require('194');
   function Spring(options) {
     Force.call(this);
     this.options = Object.create(this.constructor.DEFAULT_OPTIONS);
@@ -42926,7 +43102,7 @@ define("195", ["require", "exports", "module", "19c", "193"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("158", ["require", "exports", "module"], function(require, exports, module) {
+define("159", ["require", "exports", "module"], function(require, exports, module) {
   var entities = [];
   function get(id) {
     return entities[id];
@@ -42953,7 +43129,7 @@ define("158", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19d", ["require", "exports", "module", "139"], function(require, exports, module) {
+define("19e", ["require", "exports", "module", "139"], function(require, exports, module) {
   var Transform = require('139');
   function SpecParser() {
     this.result = {};
@@ -43061,9 +43237,9 @@ define("19d", ["require", "exports", "module", "139"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13f", ["require", "exports", "module", "158", "19d"], function(require, exports, module) {
-  var Entity = require('158');
-  var SpecParser = require('19d');
+define("13f", ["require", "exports", "module", "159", "19e"], function(require, exports, module) {
+  var Entity = require('159');
+  var SpecParser = require('19e');
   function RenderNode(object) {
     this._object = null;
     this._child = null;
@@ -43161,7 +43337,7 @@ define("13f", ["require", "exports", "module", "158", "19d"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19e", ["require", "exports", "module"], function(require, exports, module) {
+define("19f", ["require", "exports", "module"], function(require, exports, module) {
   function ElementAllocator(container) {
     if (!container)
       container = document.createDocumentFragment();
@@ -43475,8 +43651,8 @@ define("139", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("19f", ["require", "exports", "module", "149"], function(require, exports, module) {
-  var Utility = require('149');
+define("1a0", ["require", "exports", "module", "148"], function(require, exports, module) {
+  var Utility = require('148');
   function MultipleTransition(method) {
     this.method = method;
     this._instances = [];
@@ -43510,7 +43686,7 @@ define("19f", ["require", "exports", "module", "149"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a0", ["require", "exports", "module"], function(require, exports, module) {
+define("1a1", ["require", "exports", "module"], function(require, exports, module) {
   function TweenTransition(options) {
     this.options = Object.create(TweenTransition.DEFAULT_OPTIONS);
     if (options)
@@ -43754,9 +43930,9 @@ define("1a0", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("13a", ["require", "exports", "module", "19f", "1a0"], function(require, exports, module) {
-  var MultipleTransition = require('19f');
-  var TweenTransition = require('1a0');
+define("13a", ["require", "exports", "module", "1a0", "1a1"], function(require, exports, module) {
+  var MultipleTransition = require('1a0');
+  var TweenTransition = require('1a1');
   function Transitionable(start) {
     this.currentAction = null;
     this.actionQueue = [];
@@ -43885,10 +44061,10 @@ define("13a", ["require", "exports", "module", "19f", "1a0"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("152", ["require", "exports", "module", "13f", "147", "19e", "139", "13a"], function(require, exports, module) {
+define("154", ["require", "exports", "module", "13f", "14a", "19f", "139", "13a"], function(require, exports, module) {
   var RenderNode = require('13f');
-  var EventHandler = require('147');
-  var ElementAllocator = require('19e');
+  var EventHandler = require('14a');
+  var ElementAllocator = require('19f');
   var Transform = require('139');
   var Transitionable = require('13a');
   var _zeroZero = [0, 0];
@@ -43990,10 +44166,10 @@ define("152", ["require", "exports", "module", "13f", "147", "19e", "139", "13a"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("153", ["require", "exports", "module", "152", "147", "148"], function(require, exports, module) {
-  var Context = require('152');
-  var EventHandler = require('147');
-  var OptionsManager = require('148');
+define("155", ["require", "exports", "module", "154", "14a", "14b"], function(require, exports, module) {
+  var Context = require('154');
+  var EventHandler = require('14a');
+  var OptionsManager = require('14b');
   var Engine = {};
   var contexts = [];
   var nextTickQueue = [];
@@ -44171,7 +44347,7 @@ define("153", ["require", "exports", "module", "152", "147", "148"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a1", ["require", "exports", "module"], function(require, exports, module) {
+define("1a2", ["require", "exports", "module"], function(require, exports, module) {
   function EventEmitter() {
     this.listeners = {};
     this._owner = this;
@@ -44223,8 +44399,8 @@ define("1a1", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("147", ["require", "exports", "module", "1a1"], function(require, exports, module) {
-  var EventEmitter = require('1a1');
+define("14a", ["require", "exports", "module", "1a2"], function(require, exports, module) {
+  var EventEmitter = require('1a2');
   function EventHandler() {
     EventEmitter.apply(this, arguments);
     this.downstream = [];
@@ -44334,8 +44510,8 @@ define("147", ["require", "exports", "module", "1a1"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("148", ["require", "exports", "module", "147"], function(require, exports, module) {
-  var EventHandler = require('147');
+define("14b", ["require", "exports", "module", "14a"], function(require, exports, module) {
+  var EventHandler = require('14a');
   function OptionsManager(value) {
     this._value = value;
     this.eventOutput = null;
@@ -44414,10 +44590,10 @@ define("148", ["require", "exports", "module", "147"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a2", ["require", "exports", "module", "147", "153", "148"], function(require, exports, module) {
-  var EventHandler = require('147');
-  var Engine = require('153');
-  var OptionsManager = require('148');
+define("1a3", ["require", "exports", "module", "14a", "155", "14b"], function(require, exports, module) {
+  var EventHandler = require('14a');
+  var Engine = require('155');
+  var OptionsManager = require('14b');
   function ScrollSync(options) {
     this.options = Object.create(ScrollSync.DEFAULT_OPTIONS);
     this._optionsManager = new OptionsManager(this.options);
@@ -44539,7 +44715,7 @@ define("1a2", ["require", "exports", "module", "147", "153", "148"], function(re
 })();
 (function() {
 var define = $__System.amdDefine;
-define("159", ["require", "exports", "module"], function(require, exports, module) {
+define("15a", ["require", "exports", "module"], function(require, exports, module) {
   function assert(value, message) {
     if (!value) {
       throw new Error(message);
@@ -44754,23 +44930,23 @@ define("159", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a3", ["require", "exports", "module", "157", "13e", "15b", "15c", "15a", "197", "139", "147", "199", "193", "196", "194", "19b", "195", "1a2", "159"], function(require, exports, module) {
-  var LayoutUtility = require('157');
+define("1a4", ["require", "exports", "module", "149", "13e", "15c", "15d", "15b", "198", "139", "14a", "19a", "194", "197", "195", "19c", "196", "1a3", "15a"], function(require, exports, module) {
+  var LayoutUtility = require('149');
   var LayoutController = require('13e');
-  var LayoutNode = require('15b');
-  var FlowLayoutNode = require('15c');
-  var LayoutNodeManager = require('15a');
-  var ContainerSurface = require('197');
+  var LayoutNode = require('15c');
+  var FlowLayoutNode = require('15d');
+  var LayoutNodeManager = require('15b');
+  var ContainerSurface = require('198');
   var Transform = require('139');
-  var EventHandler = require('147');
-  var Group = require('199');
-  var Vector = require('193');
-  var PhysicsEngine = require('196');
-  var Particle = require('194');
-  var Drag = require('19b');
-  var Spring = require('195');
-  var ScrollSync = require('1a2');
-  var LinkedListViewSequence = require('159');
+  var EventHandler = require('14a');
+  var Group = require('19a');
+  var Vector = require('194');
+  var PhysicsEngine = require('197');
+  var Particle = require('195');
+  var Drag = require('19c');
+  var Spring = require('196');
+  var ScrollSync = require('1a3');
+  var LinkedListViewSequence = require('15a');
   var Bounds = {
     NONE: 0,
     PREV: 1,
@@ -46096,7 +46272,7 @@ define("1a3", ["require", "exports", "module", "157", "13e", "15b", "15c", "15a"
 })();
 (function() {
 var define = $__System.amdDefine;
-define("149", ["require", "exports", "module"], function(require, exports, module) {
+define("148", ["require", "exports", "module"], function(require, exports, module) {
   var Utility = {};
   Utility.Direction = {
     X: 0,
@@ -46159,8 +46335,8 @@ define("149", ["require", "exports", "module"], function(require, exports, modul
 })();
 (function() {
 var define = $__System.amdDefine;
-define("157", ["require", "exports", "module", "149"], function(require, exports, module) {
-  var Utility = require('149');
+define("149", ["require", "exports", "module", "148"], function(require, exports, module) {
+  var Utility = require('148');
   function LayoutUtility() {}
   LayoutUtility.registeredHelpers = {};
   var Capabilities = {
@@ -46313,9 +46489,9 @@ define("157", ["require", "exports", "module", "149"], function(require, exports
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a4", ["require", "exports", "module", "149", "157"], function(require, exports, module) {
-  var Utility = require('149');
-  var LayoutUtility = require('157');
+define("1a5", ["require", "exports", "module", "148", "149"], function(require, exports, module) {
+  var Utility = require('148');
+  var LayoutUtility = require('149');
   var capabilities = {
     sequence: true,
     direction: [Utility.Direction.Y, Utility.Direction.X],
@@ -46486,10 +46662,10 @@ define("1a4", ["require", "exports", "module", "149", "157"], function(require, 
 })();
 (function() {
 var define = $__System.amdDefine;
-define("1a5", ["require", "exports", "module", "157", "1a3", "1a4"], function(require, exports, module) {
-  var LayoutUtility = require('157');
-  var ScrollController = require('1a3');
-  var ListLayout = require('1a4');
+define("1a6", ["require", "exports", "module", "149", "1a4", "1a5"], function(require, exports, module) {
+  var LayoutUtility = require('149');
+  var ScrollController = require('1a4');
+  var ListLayout = require('1a5');
   var PullToRefreshState = {
     HIDDEN: 0,
     PULLING: 1,
@@ -46884,10 +47060,10 @@ define("1a5", ["require", "exports", "module", "157", "1a3", "1a4"], function(re
 });
 
 })();
-$__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '198', '134', '135', '136', '153', '152', '13c', '143', '141', '144', '142', '12c', '12d', '146', '13d', '13e', '14a', '157', '14b', '13a', '14d', '151', '139', '140', '14e', '14f', '150', '13f', '138', '1a5', '145'], function (_export, _context3) {
+$__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '199', '134', '135', '136', '155', '154', '13c', '143', '141', '144', '142', '12c', '12d', '146', '13d', '13e', '14c', '149', '14d', '13a', '14f', '153', '139', '140', '150', '151', '152', '13f', '138', '1a6', '145', '147'], function (_export, _context3) {
     "use strict";
 
-    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, HomeView, PrioritisedArray, _get, PrioritisedObject, Model, ChatMessage, ChatMessages, HomeController, _class, _temp, App$$1;
+    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, CollectionLayout, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, flow, _get, DataBoundScrollView, PrioritisedArray, PrioritisedObject, Model, ChatMessage, ChatMessages, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _dec22, _dec23, _dec24, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, _descriptor8, HomeView, HomeController, _class, _temp, App$$1;
 
     // A bunch of helper functions.
 
@@ -47420,6 +47596,39 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
         return decorations;
     }
 
+    function _extendableBuiltin(cls) {
+        function ExtendableBuiltin() {
+            cls.apply(this, arguments);
+        }
+
+        ExtendableBuiltin.prototype = Object.create(cls.prototype, {
+            constructor: {
+                value: cls,
+                enumerable: false,
+                writable: true,
+                configurable: true
+            }
+        });
+
+        if (Object.setPrototypeOf) {
+            Object.setPrototypeOf(ExtendableBuiltin, cls);
+        } else {
+            ExtendableBuiltin.__proto__ = cls;
+        }
+
+        return ExtendableBuiltin;
+    }
+
+    /**
+    
+    
+    
+     @author: Tom Clement (tjclement)
+     @license NPOSL-3.0
+     @copyright Bizboard, 2015
+    
+     */
+
     function _initDefineProp(target, property, descriptor, context) {
         if (!descriptor) return;
         Object.defineProperty(target, property, {
@@ -47459,39 +47668,6 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
         return desc;
     }
 
-    function _extendableBuiltin(cls) {
-        function ExtendableBuiltin() {
-            cls.apply(this, arguments);
-        }
-
-        ExtendableBuiltin.prototype = Object.create(cls.prototype, {
-            constructor: {
-                value: cls,
-                enumerable: false,
-                writable: true,
-                configurable: true
-            }
-        });
-
-        if (Object.setPrototypeOf) {
-            Object.setPrototypeOf(ExtendableBuiltin, cls);
-        } else {
-            ExtendableBuiltin.__proto__ = cls;
-        }
-
-        return ExtendableBuiltin;
-    }
-
-    /**
-    
-    
-    
-     @author: Tom Clement (tjclement)
-     @license NPOSL-3.0
-     @copyright Bizboard, 2015
-    
-     */
-
     return {
         setters: [function (_a) {}, function (_b) {
             firebase = _b.default;
@@ -47523,36 +47699,38 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
             FamousView = _d3.default;
         }, function (_e3) {
             LayoutController = _e3.default;
-        }, function (_a2) {
-            ImageSurface = _a2.default;
+        }, function (_c3) {
+            ImageSurface = _c3.default;
         }, function (_17) {
             LayoutUtility = _17.default;
-        }, function (_b2) {
-            OrderedHashMap = _b2.default;
-        }, function (_a3) {
-            Transitionable = _a3.default;
         }, function (_d4) {
-            Draggable = _d4.default;
+            OrderedHashMap = _d4.default;
+        }, function (_a2) {
+            Transitionable = _a2.default;
+        }, function (_f2) {
+            Draggable = _f2.default;
         }, function (_18) {
             ContainerSurface = _18.default;
         }, function (_19) {
             Transform = _19.default;
         }, function (_20) {
             Timer = _20.default;
-        }, function (_e4) {
-            GenericSync = _e4.default;
-        }, function (_f2) {
-            MouseSync = _f2.default;
         }, function (_21) {
-            TouchSync = _21.default;
+            GenericSync = _21.default;
+        }, function (_22) {
+            MouseSync = _22.default;
+        }, function (_23) {
+            TouchSync = _23.default;
         }, function (_f3) {
             RenderNode = _f3.default;
-        }, function (_22) {
-            Modifier = _22.default;
-        }, function (_a4) {
-            FlexScrollView = _a4.default;
-        }, function (_23) {
-            InputSurface = _23.default;
+        }, function (_24) {
+            Modifier = _24.default;
+        }, function (_a3) {
+            FlexScrollView = _a3.default;
+        }, function (_25) {
+            InputSurface = _25.default;
+        }, function (_26) {
+            CollectionLayout = _26.CollectionLayout;
         }],
         execute: function () {
             _classCallCheck = function (instance, Constructor) {
@@ -55454,121 +55632,909 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     };
                 }
             };
-            HomeView = (_dec$4 = layout$1.size(1000, 100), _dec2$1 = layout$1.stick.top(), _dec3 = layout$1.animate({
-                animation: AnimationController.Animation.FadedZoom,
-                transition: { duration: 1000 }
-            }), _dec4 = layout$1.translate(0, 0, -10), _dec5 = layout$1.fullSize(), _dec6 = layout$1.translate(0, 0, -5), _dec7 = layout$1.size(500, 500), _dec8 = layout$1.stick.center(), _dec9 = layout$1.size(500, 50), _dec10 = layout$1.dock.bottom(), _dec11 = layout$1.stick.center(), _dec12 = layout$1.size(500, 50), _dec13 = layout$1.dock.bottom(), _dec14 = layout$1.stick.center(), _dec15 = layout$1.size(500, 500), _dec16 = layout$1.stick.center(), _dec17 = layout$1.animate({
-                showInitially: false,
-                animation: AnimationController.Animation.FadedZoom,
-                transition: { duration: 500 }
-            }), _dec18 = layout$1.stick.center(), _dec19 = layout$1.size(500, 100), _dec20 = layout$1.dock.bottom(), _dec21 = layout$1.stick.center(), (_class$6 = function (_View) {
-                _inherits(HomeView, _View);
 
-                //The Message
+            _get = function get(object, property, receiver) {
+                if (object === null) object = Function.prototype;
+                var desc = Object.getOwnPropertyDescriptor(object, property);
 
+                if (desc === undefined) {
+                    var parent = Object.getPrototypeOf(object);
 
-                //Footer space
+                    if (parent === null) {
+                        return undefined;
+                    } else {
+                        return get(parent, property, receiver);
+                    }
+                } else if ("value" in desc) {
+                    return desc.value;
+                } else {
+                    var getter = desc.get;
 
-                //Background
+                    if (getter === undefined) {
+                        return undefined;
+                    }
 
-                function HomeView() {
+                    return getter.call(receiver);
+                }
+            };
+
+            DataBoundScrollView = function (_ReflowingScrollView) {
+                _inherits(DataBoundScrollView, _ReflowingScrollView);
+
+                _createClass(DataBoundScrollView, [{
+                    key: 'internalDataSource',
+                    get: function get() {
+                        return this._internalDataSource;
+                    }
+                }]);
+
+                function DataBoundScrollView() {
                     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-                    _classCallCheck(this, HomeView);
+                    _classCallCheck(this, DataBoundScrollView);
 
-                    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HomeView).call(this, options));
+                    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DataBoundScrollView).call(this, combineOptions({
+                        scrollFriction: {
+                            strength: 0.0015
+                        },
+                        autoPipeEvents: true,
+                        throttleDelay: 0, /* If set to 0, no delay is added in between adding items to the DataBoundScrollView. */
+                        dataSource: [],
+                        sortingDirection: 'ascending',
+                        flow: true,
+                        flowOptions: {
+                            spring: { // spring-options used when transitioning between states
+                                dampingRatio: 0.8, // spring damping ratio
+                                period: 1000 // duration of the animation
+                            },
+                            insertSpec: { // render-spec used when inserting renderables
+                                opacity: 0 // start opacity is 0, causing a fade-in effect,
+                            }
+                        },
+                        dataFilter: function dataFilter() {
+                            return true;
+                        },
+                        ensureVisible: null,
+                        layoutOptions: {
+                            isSectionCallback: options.stickyHeaders ? function (renderNode) {
+                                return renderNode.groupId !== undefined;
+                            } : undefined
+                        },
+                        chatScrolling: false
+                    }, options)));
 
-                    _initDefineProp(_this, 'title', _descriptor, _this);
+                    _this._internalDataSource = {};
+                    _this._internalGroups = {};
+                    _this.isGrouped = _this.options.groupBy != null;
+                    _this.isDescending = _this.options.sortingDirection === 'descending';
+                    _this.throttler = new Throttler(_this.options.throttleDelay, true, _this);
 
-                    _initDefineProp(_this, 'background', _descriptor2, _this);
+                    _this._useCustomOrdering = !!_this.options.orderBy;
+                    /* If no orderBy method is set, or it is a string field name, we set our own ordering method. */
+                    if (!_this.options.orderBy || typeof _this.options.orderBy === 'string') {
+                        (function () {
+                            var fieldName = _this.options.orderBy || 'id';
+                            _this.options.orderBy = function (currentChild, _ref) {
+                                var model = _ref.model;
 
-                    _initDefineProp(_this, 'messages', _descriptor3, _this);
+                                if (this.isDescending) {
+                                    return currentChild[fieldName] > model[fieldName];
+                                } else {
+                                    return currentChild[fieldName] < model[fieldName];
+                                }
+                            }.bind(_this);
+                        })();
+                    }
 
-                    _initDefineProp(_this, 'footerspace', _descriptor4, _this);
+                    /* If present in options.headerTemplate or options.placeholderTemplate, we build the header and placeholder elements. */
+                    _this.addHeader();
+                    _this._addPlaceholder();
 
-                    _initDefineProp(_this, 'sendbutton', _descriptor5, _this);
-
-                    _initDefineProp(_this, 'submitedmessage', _descriptor6, _this);
-
-                    _initDefineProp(_this, 'inputmessage', _descriptor7, _this);
-
+                    if (_this.options.dataStore) {
+                        _this._bindDataSource(_this.options.dataStore);
+                    }
                     return _this;
                 }
-                // @event.on('keyup', function(e) { if (e.keyCode == 13) { this.showRenderable('submitedmessage'); }})
 
+                /**
+                 * Set a template function, optionally re-renders all the dataSource' renderables
+                 * @param templateFunction
+                 */
 
-                //Inputfield for chat message
+                _createClass(DataBoundScrollView, [{
+                    key: 'setItemTemplate',
+                    value: function setItemTemplate() {
+                        var templateFunction = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+                        var reRender = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-                // @event.on('click', function(){ this.showRenderable('submitedmessage'); })
+                        this.options.itemTemplate = templateFunction;
 
-                //Sendbutton
-
-                //View messages area container
-
-
-                return HomeView;
-            }(View), (_descriptor = _applyDecoratedDescriptor(_class$6.prototype, 'title', [_dec$4, _dec2$1, _dec3], {
-                enumerable: true,
-                initializer: function initializer() {
-                    return new Surface({
-                        content: 'Arva Chat Appje',
-                        properties: {
-                            textAlign: 'center',
-                            color: 'black',
-                            fontSize: '50px'
+                        if (reRender) {
+                            this.clearDataSource();
+                            this.reloadFilter(this.options.dataFilter);
                         }
-                    });
-                }
-            }), _descriptor2 = _applyDecoratedDescriptor(_class$6.prototype, 'background', [_dec4, _dec5], {
-                enumerable: true,
-                initializer: function initializer() {
-                    return new Surface({ properties: { backgroundColor: 'blanchedalmond' } });
-                }
-            }), _descriptor3 = _applyDecoratedDescriptor(_class$6.prototype, 'messages', [_dec6, _dec7, _dec8], {
-                enumerable: true,
-                initializer: function initializer() {
-                    return new Surface({
-                        properties: {
-                            backgroundColor: 'lightblue'
+                    }
+                }, {
+                    key: 'setGroupTemplate',
+                    value: function setGroupTemplate() {
+                        var templateFunction = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+                        var reRender = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+                        this.options.groupTemplate = templateFunction;
+
+                        if (reRender) {
+                            this.clearDataSource();
+                            this.reloadFilter(this.options.dataFilter);
                         }
-                    });
-                }
-            }), _descriptor4 = _applyDecoratedDescriptor(_class$6.prototype, 'footerspace', [_dec9, _dec10, _dec11], {
-                enumerable: true,
-                initializer: function initializer() {
-                    return new Surface({});
-                }
-            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec12, _dec13, _dec14], {
-                enumerable: true,
-                initializer: function initializer() {
-                    return new InputSurface({
-                        value: 'Send',
-                        type: 'button',
-                        properties: {
-                            backgroundColor: 'lightblue',
-                            borderRadius: '10px',
-                            marginTop: '10px'
+                    }
+                }, {
+                    key: 'setDataStore',
+                    value: function setDataStore(dataStore) {
+                        if (this.options.dataStore) {
+                            this.clearDataSource();
                         }
-                    });
-                }
-            }), _descriptor6 = _applyDecoratedDescriptor(_class$6.prototype, 'submitedmessage', [_dec15, _dec16, _dec17, _dec18], {
-                enumerable: true,
-                initializer: function initializer() {
-                    return new Surface();
-                }
-            }), _descriptor7 = _applyDecoratedDescriptor(_class$6.prototype, 'inputmessage', [_dec19, _dec20, _dec21], {
-                enumerable: true,
-                initializer: function initializer() {
-                    return new InputSurface({
-                        placeholder: '... ... ...',
-                        properties: {
-                            textAlign: 'center',
-                            color: 'black',
-                            padding: '20px'
+                        this.options.dataStore = dataStore;
+                        this._bindDataSource(this.options.dataStore);
+                    }
+                }, {
+                    key: 'getDataStore',
+                    value: function getDataStore() {
+                        return this.options.dataStore;
+                    }
+
+                    /**
+                     * Reloads the dataFilter option of the DataBoundScrollView, and verifies whether the items in the dataStore are allowed by the new filter.
+                     * It removes any currently visible items that aren't allowed anymore, and adds any non-visible ones that are allowed now.
+                     * @param {Function} newFilter New filter function to verify item visibility with.
+                     * @param {Boolean} reRender Boolean to rerender all childs that pass the filter function. Usefull when setting a new itemTemplate alongside reloading the filter
+                     * @returns {Promise} Resolves when filter has been applied
+                     */
+
+                }, {
+                    key: 'reloadFilter',
+                    value: function reloadFilter(newFilter) {
+                        var _this2 = this;
+
+                        this.options.dataFilter = newFilter;
+
+                        var filterPromises = [];
+
+                        var _loop = function _loop() {
+                            if (_isArray) {
+                                if (_i >= _iterator.length) return 'break';
+                                _ref2 = _iterator[_i++];
+                            } else {
+                                _i = _iterator.next();
+                                if (_i.done) return 'break';
+                                _ref2 = _i.value;
+                            }
+
+                            var entry = _ref2;
+
+                            var alreadyExists = _this2._internalDataSource[entry.id] !== undefined;
+                            var result = newFilter(entry);
+
+                            if (result instanceof Promise) {
+                                filterPromises.push(result);
+                                result.then(function (shouldShow) {
+                                    this._handleNewFilterResult(shouldShow, alreadyExists, entry);
+                                }.bind(_this2));
+                            } else {
+                                _this2._handleNewFilterResult(result, alreadyExists, entry);
+                            }
+                        };
+
+                        for (var _iterator = this.options.dataStore || [], _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+                            var _ref2;
+
+                            var _ret2 = _loop();
+
+                            if (_ret2 === 'break') break;
                         }
-                    });
-                }
-            })), _class$6));
+                        return Promise.all(filterPromises);
+                    }
+
+                    /**
+                     * Clears the dataSource by removing all entries
+                     */
+
+                }, {
+                    key: 'clearDataSource',
+                    value: function clearDataSource() {
+                        for (var _iterator2 = this.options.dataStore || [], _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+                            var _ref3;
+
+                            if (_isArray2) {
+                                if (_i2 >= _iterator2.length) break;
+                                _ref3 = _iterator2[_i2++];
+                            } else {
+                                _i2 = _iterator2.next();
+                                if (_i2.done) break;
+                                _ref3 = _i2.value;
+                            }
+
+                            var _entry = _ref3;
+
+                            this._removeItem(_entry);
+                        }
+                    }
+
+                    /**
+                     * Determines whether the last element showing is the actual last element
+                     * @returns {boolean} True if the last element showing is the actual last element
+                     */
+
+                }, {
+                    key: 'isAtBottom',
+                    value: function isAtBottom() {
+                        var lastVisibleItem = this.getLastVisibleItem();
+                        return lastVisibleItem && lastVisibleItem.renderNode === this._dataSource._.tail._value;
+                    }
+
+                    /**
+                     * Returns the currently active group elements, or an empty object of none are present.
+                     * @returns {Object}
+                     */
+
+                }, {
+                    key: 'getGroups',
+                    value: function getGroups() {
+                        return this._internalGroups || {};
+                    }
+                }, {
+                    key: '_handleNewFilterResult',
+                    value: function _handleNewFilterResult(shouldShow, alreadyExists, entry) {
+                        if (shouldShow) {
+                            /* This entry should be in the view, add it if it doesn't exist yet. */
+                            if (!alreadyExists) {
+                                this._addItem(entry);
+                            }
+                        } else {
+                            /* This entry should not be in the view, remove if present. */
+                            if (alreadyExists) {
+                                this._removeItem(entry);
+                            }
+                        }
+                    }
+                }, {
+                    key: '_findGroup',
+                    value: function _findGroup(groupId) {
+                        return this._internalGroups[groupId] || -1;
+                    }
+                }, {
+                    key: '_getGroupByValue',
+                    value: function _getGroupByValue(child) {
+                        var groupByValue = '';
+                        if (typeof this.options.groupBy === 'function') {
+                            groupByValue = this.options.groupBy(child);
+                        } else if (typeof this.options.groupBy === 'string') {
+                            groupByValue = this.options.groupBy;
+                        }
+                        return groupByValue;
+                    }
+                }, {
+                    key: '_addGroupItem',
+                    value: function _addGroupItem(groupByValue, insertIndex) {
+                        var newSurface = this.options.groupTemplate(groupByValue);
+                        newSurface.groupId = groupByValue;
+                        this._internalGroups[groupByValue] = { position: insertIndex, itemsCount: 0 };
+                        this.insert(insertIndex, newSurface);
+
+                        return newSurface;
+                    }
+                }, {
+                    key: '_getInsertIndex',
+                    value: function _getInsertIndex(child) {
+                        var previousSiblingID = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
+
+                        /* By default, add item at the end if the orderBy function does not specify otherwise. */
+                        var firstIndex = this._getZeroIndex();
+                        var insertIndex = this._dataSource.getLength();
+                        var placedWithinGroup = false;
+
+                        if (this.isGrouped) {
+                            var groupIndex = void 0;
+                            var groupId = this._getGroupByValue(child);
+                            var groupData = this._findGroup(groupId);
+                            if (groupData) groupIndex = groupData.position;
+                            if (groupIndex != undefined && groupIndex !== -1) {
+                                for (insertIndex = groupIndex + 1; insertIndex <= groupIndex + groupData.itemsCount; insertIndex++) {
+                                    if (this.options.orderBy) {
+                                        var dataId = this._viewSequence.findByIndex(insertIndex)._value.dataId;
+                                        if (dataId && this.options.orderBy(child, this._internalDataSource[dataId])) {
+                                            break;
+                                        }
+                                    } else {
+                                        insertIndex += this._internalGroups[groupId].itemsCount;
+                                        break;
+                                    }
+                                }
+                                placedWithinGroup = true;
+                            }
+                        }
+
+                        if (!placedWithinGroup) {
+                            /* If we have an orderBy function, find the index we should be inserting at. */
+                            if (this._useCustomOrdering && this.options.orderBy && typeof this.options.orderBy === 'function' || this.isGrouped) {
+                                var foundOrderedIndex = -1;
+                                if (this.isGrouped) {
+
+                                    for (var _iterator3 = _.sortBy(this._internalGroups, 'position'), _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+                                        var _ref4;
+
+                                        if (_isArray3) {
+                                            if (_i3 >= _iterator3.length) break;
+                                            _ref4 = _iterator3[_i3++];
+                                        } else {
+                                            _i3 = _iterator3.next();
+                                            if (_i3.done) break;
+                                            _ref4 = _i3.value;
+                                        }
+
+                                        var group = _ref4;
+
+                                        /* Check the first and last item of every group (they're sorted) */
+                                        for (var _iterator4 = group.itemsCount > 1 ? [group.position + 1, group.position + group.itemsCount - 1] : [group.position + 1], _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+                                            var _ref5;
+
+                                            if (_isArray4) {
+                                                if (_i4 >= _iterator4.length) break;
+                                                _ref5 = _iterator4[_i4++];
+                                            } else {
+                                                _i4 = _iterator4.next();
+                                                if (_i4.done) break;
+                                                _ref5 = _i4.value;
+                                            }
+
+                                            var position = _ref5;
+
+                                            var _dataId = this._viewSequence.findByIndex(position)._value.dataId;
+
+                                            if (this.options.orderBy(child, this._internalDataSource[_dataId])) {
+                                                foundOrderedIndex = group.position;
+                                                break;
+                                            }
+                                        }
+                                        if (foundOrderedIndex > -1) {
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    foundOrderedIndex = this.orderBy(child, this.options.orderBy);
+                                }
+
+                                if (foundOrderedIndex !== -1) {
+                                    insertIndex = foundOrderedIndex;
+                                }
+                                /*
+                                 There is no guarantee of order when grouping objects unless orderBy is explicitly defined
+                                 */
+                            } else if (previousSiblingID !== undefined && previousSiblingID != null) {
+                                /* We don't have an orderBy method, but do have a previousSiblingID we can use to find the correct insertion index. */
+                                var siblingIndex = this._findData(previousSiblingID).position;
+                                if (siblingIndex !== -1) {
+                                    insertIndex = siblingIndex + 1;
+                                }
+                            }
+                        }
+
+                        return insertIndex;
+                    }
+                }, {
+                    key: '_insertGroup',
+                    value: function _insertGroup(insertIndex, groupByValue) {
+                        var groupIndex = this._findGroup(groupByValue);
+                        if (groupByValue) {
+                            var groupExists = groupIndex !== -1;
+                            if (!groupExists) {
+                                /* No group of this value exists yet, so we'll need to create one. */
+                                this._updatePosition(insertIndex, 1);
+                                var newSurface = this._addGroupItem(groupByValue, insertIndex);
+                                this._insertId('group_' + groupByValue, insertIndex, newSurface, null, { groupId: groupByValue });
+                                /*insertIndex++;*/
+                            }
+                            return !groupExists;
+                        }
+                        return null;
+                    }
+                }, {
+                    key: '_addItem',
+                    value: function () {
+                        var ref = _asyncToGenerator(_regeneratorRuntime.mark(function _callee(child) {
+                            var previousSiblingID = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
+                            var insertIndex, groupByValue, newSurface, insertSpec, shouldEnsureVisibleUndefined, shouldEnsureVisible;
+                            return _regeneratorRuntime.wrap(function _callee$(_context) {
+                                while (1) {
+                                    switch (_context.prev = _context.next) {
+                                        case 0:
+                                            if (!this._findData(child.id)) {
+                                                _context.next = 3;
+                                                break;
+                                            }
+
+                                            console.log('Child already exists ', child.id);
+                                            return _context.abrupt('return');
+
+                                        case 3:
+
+                                            this._removePlaceholder();
+
+                                            insertIndex = this._getInsertIndex(child, previousSiblingID);
+
+                                            /* If we're using groups, check if we need to insert a group item before this child. */
+
+                                            if (this.isGrouped) {
+                                                groupByValue = this._getGroupByValue(child);
+
+                                                if (this._insertGroup(insertIndex, groupByValue)) {
+                                                    /* If a new group is inserted, then increase the insert index */
+                                                    insertIndex++;
+                                                }
+                                                /* Increase the count of the number of items in the group */
+                                                this._internalGroups[groupByValue].itemsCount++;
+                                            }
+
+                                            newSurface = this.options.itemTemplate(child);
+
+                                            if (!(newSurface instanceof Promise)) {
+                                                _context.next = 11;
+                                                break;
+                                            }
+
+                                            _context.next = 10;
+                                            return newSurface;
+
+                                        case 10:
+                                            newSurface = _context.sent;
+
+                                        case 11:
+
+                                            newSurface.dataId = child.id;
+                                            this._subscribeToClicks(newSurface, child);
+
+                                            /* If we're scrolling as with a chat window, then scroll to last child if we're at the bottom */
+                                            if (this.options.chatScrolling && insertIndex === this._dataSource.getLength()) {
+                                                if (this.isAtBottom() || !this._allChildrenAdded) {
+                                                    this._lastChild = child;
+                                                }
+                                            }
+                                            insertSpec = void 0;
+
+                                            if (this.options.customInsertSpec) {
+                                                insertSpec = this.options.customInsertSpec(child);
+                                            }
+
+                                            this.insert(insertIndex, newSurface, insertSpec);
+                                            this._updatePosition(insertIndex);
+                                            this._insertId(child.id, insertIndex, newSurface, child);
+
+                                            if (this.options.ensureVisible != null || this.options.chatScrolling) {
+                                                shouldEnsureVisibleUndefined = this.options.ensureVisible == null;
+                                                shouldEnsureVisible = !shouldEnsureVisibleUndefined ? this.options.ensureVisible(child, newSurface, insertIndex) : false;
+
+                                                if (this.options.chatScrolling) {
+                                                    if (child === this._lastChild && (shouldEnsureVisible || shouldEnsureVisibleUndefined)) {
+                                                        this.ensureVisible(newSurface);
+                                                    }
+                                                } else if (shouldEnsureVisible) {
+                                                    this.ensureVisible(newSurface);
+                                                }
+                                            }
+
+                                            _get(Object.getPrototypeOf(DataBoundScrollView.prototype), '_addItem', this).call(this, child, previousSiblingID);
+
+                                        case 21:
+                                        case 'end':
+                                            return _context.stop();
+                                    }
+                                }
+                            }, _callee, this);
+                        }));
+
+                        function _addItem(_x7, _x8) {
+                            return ref.apply(this, arguments);
+                        }
+
+                        return _addItem;
+                    }()
+                }, {
+                    key: '_replaceItem',
+                    value: function _replaceItem(child) {
+                        var index = this._findData(child.id).position;
+
+                        var newSurface = this.options.itemTemplate(child);
+                        newSurface.dataId = child.id;
+                        this._subscribeToClicks(newSurface, child);
+                        this._insertId(child.id, index, newSurface, child);
+                        this.replace(index, newSurface, true);
+                    }
+
+                    /**
+                     * Patch because Hein forgot to auto pipe events when replacing
+                     * @param indexOrId
+                     * @param renderable
+                     * @param noAnimation
+                     */
+
+                }, {
+                    key: 'replace',
+                    value: function replace(indexOrId, renderable, noAnimation) {
+                        _get(Object.getPrototypeOf(DataBoundScrollView.prototype), 'replace', this).call(this, indexOrId, renderable, noAnimation);
+                        // Auto pipe events
+                        if (this.options.autoPipeEvents && renderable && renderable.pipe) {
+                            renderable.pipe(this);
+                            renderable.pipe(this._eventOutput);
+                        }
+                    }
+                }, {
+                    key: '_removeGroupIfNecessary',
+                    value: function _removeGroupIfNecessary(groupByValue) {
+                        /* Check if the group corresponding to the child is now empty */
+                        var group = this._internalGroups[groupByValue];
+                        if (group && group.itemsCount === 0) {
+                            /* TODO: Maybe remove internalgroups[groupByValue]? (Or not?) */
+                            var position = group.position;
+
+                            this._updatePosition(position, -1);
+                            this.remove(position);
+                            delete this._internalGroups[groupByValue];
+                            delete this._internalDataSource[groupByValue];
+                        }
+                    }
+                }, {
+                    key: '_removeItem',
+                    value: function _removeItem(child) {
+                        var internalChild = this.internalDataSource[child.id] || {};
+                        var index = internalChild.position;
+                        if (index > -1) {
+                            this._updatePosition(index, -1);
+                            this.remove(index);
+                            delete this.internalDataSource[child.id];
+                        }
+
+                        /* If we're using groups, check if we need to remove the group that this child belonged to. */
+                        if (this.isGrouped) {
+                            var groupByValue = this._getGroupByValue(child);
+                            var group = this._internalGroups[groupByValue];
+                            if (group) {
+                                group.itemsCount--;
+                            }
+
+                            this._removeGroupIfNecessary(groupByValue);
+                        }
+
+                        /* The amount of items in the dataSource is subtracted with a header if present, to get the total amount of actual items in the scrollView. */
+                        var itemCount = this._dataSource.getLength() - this._getZeroIndex();
+                        if (itemCount === 0) {
+                            this._addPlaceholder();
+                        }
+                    }
+                }, {
+                    key: '_moveItem',
+                    value: function _moveItem(oldId) {
+                        var prevChildId = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+                        var oldData = this._findData(oldId);
+                        var oldIndex = oldData.position;
+
+                        var previousSiblingIndex = this._getNextVisibleIndex(prevChildId);
+                        if (oldIndex !== previousSiblingIndex) {
+                            this.move(oldIndex, previousSiblingIndex);
+                            this._internalDataSource[previousSiblingIndex] = oldData;
+                            this._internalDataSource[previousSiblingIndex].position = oldIndex;
+                        }
+                    }
+                }, {
+                    key: 'addHeader',
+                    value: function addHeader() {
+                        if (this.options.headerTemplate) {
+                            this.header = this.options.headerTemplate();
+                            this.header.isHeader = true;
+                            this._insertId(0, 0, this.header, null, { isHeader: true });
+                            this.insert(0, this.header);
+                        }
+                    }
+                }, {
+                    key: 'removeHeader',
+                    value: function removeHeader() {
+                        if (this.header) {
+                            this.remove(0);
+                            delete this.internalDataSource[0];
+                            this.header = null;
+                        }
+                    }
+                }, {
+                    key: '_addPlaceholder',
+                    value: function _addPlaceholder() {
+                        if (this.options.placeholderTemplate && !this.placeholder) {
+                            var insertIndex = this._getZeroIndex();
+                            this.placeholder = this.options.placeholderTemplate();
+                            this.placeholder.isPlaceholder = true;
+                            this.insert(insertIndex, this.placeholder);
+                        }
+                    }
+                }, {
+                    key: '_getZeroIndex',
+                    value: function _getZeroIndex() {
+                        return this.header ? 1 : 0;
+                    }
+                }, {
+                    key: '_removePlaceholder',
+                    value: function _removePlaceholder() {
+                        if (this.placeholder) {
+                            if (this.placeholder) this.remove(this._getZeroIndex());
+                            this.placeholder = null;
+                        }
+                    }
+                }, {
+                    key: '_bindDataSource',
+                    value: function _bindDataSource() {
+                        var _this3 = this;
+
+                        if (!this.options.dataStore || !this.options.itemTemplate) {
+                            console.log('Datasource and template should both be set.');
+                            return;
+                        }
+
+                        if (!this.options.template instanceof Function) {
+                            console.log('Template needs to be a function.');
+                            return;
+                        }
+                        if (this.options.chatScrolling) {
+                            this.options.dataStore.on('ready', function () {
+                                return _this3._allChildrenAdded = true;
+                            });
+                        }
+
+                        this.options.dataStore.on('child_added', this._onChildAdded.bind(this));
+                        this.options.dataStore.on('child_changed', this._onChildChanged.bind(this));
+                        this.options.dataStore.on('child_moved', this._onChildMoved.bind(this));
+                        this.options.dataStore.on('child_removed', this._onChildRemoved.bind(this));
+                    }
+                }, {
+                    key: '_onChildAdded',
+                    value: function _onChildAdded(child, previousSiblingID) {
+                        var _this4 = this;
+
+                        if (this.options.dataFilter && typeof this.options.dataFilter === 'function') {
+
+                            var _result = this.options.dataFilter(child);
+
+                            if (_result instanceof Promise) {
+                                /* If the result is a Promise, show the item when that promise resolves. */
+                                _result.then(function (show) {
+                                    if (show) {
+                                        _this4.throttler.add(function () {
+                                            _this4._addItem(child, previousSiblingID);
+                                        });
+                                    }
+                                });
+                            } else if (_result) {
+                                /* The result is an item, so we can add it directly. */
+                                this.throttler.add(function () {
+                                    _this4._addItem(child, previousSiblingID);
+                                });
+                            }
+                        } else {
+                            /* There is no dataFilter method, so we can add this child. */
+                            this.throttler.add(function () {
+                                _this4._addItem(child, previousSiblingID);
+                            });
+                        }
+                    }
+                }, {
+                    key: '_onChildChanged',
+                    value: function _onChildChanged(child, previousSiblingID) {
+                        var _this6 = this;
+
+                        var changedItemIndex = this._getDataSourceIndex(child.id);
+
+                        if (this._dataSource && changedItemIndex < this._dataSource.getLength()) {
+
+                            var _result2 = this.options.dataFilter ? this.options.dataFilter(child) : true;
+
+                            if (_result2 instanceof Promise) {
+                                _result2.then(function (show) {
+                                    var _this5 = this;
+
+                                    if (show) {
+                                        this.throttler.add(function () {
+                                            _this5._replaceItem(child);
+                                        });
+                                    } else {
+                                        this._removeItem(child);
+                                    }
+                                }.bind(this));
+                            } else if (this.options.dataFilter && typeof this.options.dataFilter === 'function' && !_result2) {
+                                this._removeItem(child);
+                            } else {
+                                if (changedItemIndex === -1) {
+                                    this.throttler.add(function () {
+                                        _this6._addItem(child, previousSiblingID);
+                                    });
+                                } else {
+                                    this.throttler.add(function () {
+                                        _this6._replaceItem(child);
+                                        if (previousSiblingID && !_this6.isGrouped && !_this6._useCustomOrdering) {
+                                            _this6._moveItem(child.id, previousSiblingID);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    key: '_onChildMoved',
+                    value: function _onChildMoved(child, previousSiblingID) {
+                        var _this7 = this;
+
+                        var current = this._getDataSourceIndex(child.id);
+                        this.throttler.add(function () {
+                            _this7._moveItem(current, previousSiblingID);
+                        });
+                    }
+                }, {
+                    key: '_onChildRemoved',
+                    value: function _onChildRemoved(child) {
+                        var _this8 = this;
+
+                        this.throttler.add(function () {
+                            _this8._removeItem(child);
+                        });
+                    }
+                }, {
+                    key: '_getDataSourceIndex',
+                    value: function _getDataSourceIndex(id) {
+                        var data = this._findData(id);
+                        return data ? data.position : -1;
+                    }
+                }, {
+                    key: '_getNextVisibleIndex',
+                    value: function _getNextVisibleIndex(id) {
+                        var viewIndex = -1;
+                        var viewData = this._findData(id);
+
+                        if (viewData) {
+                            viewIndex = viewData.position;
+                        }
+
+                        if (viewIndex === -1) {
+
+                            var modelIndex = _.findIndex(this.options.dataStore, function (model) {
+                                return model.id === id;
+                            });
+
+                            if (modelIndex === 0 || modelIndex === -1) {
+                                return this.isDescending ? this._dataSource ? this._dataSource.getLength() - 1 : 0 : 0;
+                            } else {
+                                var nextModel = this.options.dataStore[this.isDescending ? modelIndex + 1 : modelIndex - 1];
+                                var nextIndex = this._findData(nextModel.id).position;
+                                if (nextIndex > -1) {
+                                    return this.isDescending ? nextIndex === 0 ? 0 : nextIndex - 1 : this._dataSource.getLength() === nextIndex + 1 ? nextIndex : nextIndex + 1;
+                                } else {
+                                    return this._getNextVisibleIndex(nextModel.id);
+                                }
+                            }
+                        } else {
+                            return this.isDescending ? viewIndex === 0 ? 0 : viewIndex - 1 : this._dataSource.getLength() === viewIndex + 1 ? viewIndex : viewIndex + 1;
+                        }
+                    }
+                }, {
+                    key: 'orderBy',
+                    value: function orderBy(child, orderByFunction) {
+                        var item = this._dataSource._.head;
+                        var index = 0;
+
+                        while (item) {
+                            if (item._value.dataId && this.internalDataSource[item._value.dataId] && orderByFunction(child, this.internalDataSource[item._value.dataId])) {
+                                return index;
+                            }
+
+                            index++;
+                            item = item._next;
+                        }
+                        return -1;
+                    }
+                }, {
+                    key: '_updatePosition',
+                    value: function _updatePosition(position) {
+                        var change = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+
+                        if (position === undefined || position === this._dataSource.getLength() - 1) return;
+                        for (var _iterator5 = Object.keys(this.internalDataSource), _isArray5 = Array.isArray(_iterator5), _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
+                            var _ref6;
+
+                            if (_isArray5) {
+                                if (_i5 >= _iterator5.length) break;
+                                _ref6 = _iterator5[_i5++];
+                            } else {
+                                _i5 = _iterator5.next();
+                                if (_i5.done) break;
+                                _ref6 = _i5.value;
+                            }
+
+                            var element = _ref6;
+
+                            var dataObject = this.internalDataSource[element];
+                            if (dataObject.position >= position) {
+                                dataObject.position += change;
+                            }
+                        }
+                        if (this.isGrouped) {
+                            this._updateGroupPosition(position, change);
+                        }
+                    }
+                }, {
+                    key: '_updateGroupPosition',
+                    value: function _updateGroupPosition(position) {
+                        var change = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+
+                        for (var _iterator6 = Object.keys(this._internalGroups), _isArray6 = Array.isArray(_iterator6), _i6 = 0, _iterator6 = _isArray6 ? _iterator6 : _iterator6[Symbol.iterator]();;) {
+                            var _ref7;
+
+                            if (_isArray6) {
+                                if (_i6 >= _iterator6.length) break;
+                                _ref7 = _iterator6[_i6++];
+                            } else {
+                                _i6 = _iterator6.next();
+                                if (_i6.done) break;
+                                _ref7 = _i6.value;
+                            }
+
+                            var element = _ref7;
+
+                            if (this._internalGroups[element].position >= position) {
+                                /* Update the position of groups coming after */
+                                this._internalGroups[element].position += change;
+                            }
+                        }
+                    }
+                }, {
+                    key: '_findData',
+                    value: function _findData(id) {
+                        var data = this.internalDataSource[id] || undefined;
+                        return data;
+                    }
+                }, {
+                    key: '_insertId',
+                    value: function _insertId() {
+                        var id = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+                        var position = arguments[1];
+                        var renderable = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+                        var model = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+                        var options = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
+
+                        if (id === undefined || id === null) return;
+
+                        this._internalDataSource[id] = { position: position, renderable: renderable, model: model };
+                        for (var _iterator7 = Object.keys(options), _isArray7 = Array.isArray(_iterator7), _i7 = 0, _iterator7 = _isArray7 ? _iterator7 : _iterator7[Symbol.iterator]();;) {
+                            var _ref8;
+
+                            if (_isArray7) {
+                                if (_i7 >= _iterator7.length) break;
+                                _ref8 = _iterator7[_i7++];
+                            } else {
+                                _i7 = _iterator7.next();
+                                if (_i7.done) break;
+                                _ref8 = _i7.value;
+                            }
+
+                            var element = _ref8;
+
+                            this._internalDataSource[id][element] = options[element];
+                        }
+                    }
+                }, {
+                    key: '_subscribeToClicks',
+                    value: function _subscribeToClicks(surface, model) {
+                        surface.on('click', function () {
+                            this._eventOutput.emit('child_click', { renderNode: surface, dataObject: model });
+                        }.bind(this));
+                    }
+                }]);
+
+                return DataBoundScrollView;
+            }(ReflowingScrollView);
 
             PrioritisedArray = function (_extendableBuiltin2) {
                 _inherits(PrioritisedArray, _extendableBuiltin2);
@@ -56130,31 +57096,6 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
 
                 return PrioritisedArray;
             }(_extendableBuiltin(Array));
-
-            _get = function get(object, property, receiver) {
-                if (object === null) object = Function.prototype;
-                var desc = Object.getOwnPropertyDescriptor(object, property);
-
-                if (desc === undefined) {
-                    var parent = Object.getPrototypeOf(object);
-
-                    if (parent === null) {
-                        return undefined;
-                    } else {
-                        return get(parent, property, receiver);
-                    }
-                } else if ("value" in desc) {
-                    return desc.value;
-                } else {
-                    var getter = desc.get;
-
-                    if (getter === undefined) {
-                        return undefined;
-                    }
-
-                    return getter.call(receiver);
-                }
-            };
 
             PrioritisedObject = function (_EventEmitter) {
                 _inherits(PrioritisedObject, _EventEmitter);
@@ -56763,6 +57704,140 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
 
                 return ChatMessages;
             }(PrioritisedArray);
+
+            HomeView = (_dec$4 = layout$1.size(1000, 100), _dec2$1 = layout$1.stick.top(), _dec3 = layout$1.animate({
+                animation: AnimationController.Animation.FadedZoom,
+                transition: { duration: 1000 }
+            }), _dec4 = layout$1.translate(0, 0, -10), _dec5 = layout$1.fullSize(), _dec6 = layout$1.translate(0, 0, -5), _dec7 = layout$1.size(500, 500), _dec8 = layout$1.stick.center(), _dec9 = layout$1.translate(0, 0, -4), _dec10 = layout$1.size(500, 500), _dec11 = layout$1.stick.center(), _dec12 = layout$1.size(500, 50), _dec13 = layout$1.dock.bottom(), _dec14 = layout$1.stick.center(), _dec15 = layout$1.size(500, 50), _dec16 = layout$1.dock.bottom(), _dec17 = layout$1.stick.center(), _dec18 = layout$1.size(500, 500), _dec19 = layout$1.stick.center(), _dec20 = layout$1.animate({
+                showInitially: false,
+                animation: AnimationController.Animation.FadedZoom,
+                transition: { duration: 500 }
+            }), _dec21 = layout$1.stick.center(), _dec22 = layout$1.size(500, 100), _dec23 = layout$1.dock.bottom(), _dec24 = layout$1.stick.center(), (_class$6 = function (_View) {
+                _inherits(HomeView, _View);
+
+                //The Message
+
+
+                //Footer space
+
+                //View messages area
+
+                function HomeView() {
+                    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+                    _classCallCheck(this, HomeView);
+
+                    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HomeView).call(this, options));
+
+                    _initDefineProp(_this, 'title', _descriptor, _this);
+
+                    _initDefineProp(_this, 'background', _descriptor2, _this);
+
+                    _initDefineProp(_this, 'messages', _descriptor3, _this);
+
+                    _initDefineProp(_this, 'scrollView', _descriptor4, _this);
+
+                    _initDefineProp(_this, 'footerspace', _descriptor5, _this);
+
+                    _initDefineProp(_this, 'sendbutton', _descriptor6, _this);
+
+                    _initDefineProp(_this, 'submitedmessage', _descriptor7, _this);
+
+                    _initDefineProp(_this, 'inputmessage', _descriptor8, _this);
+
+                    return _this;
+                }
+                // @event.on('keyup', function(e) { if (e.keyCode == 13) { this.showRenderable('submitedmessage'); }})
+
+
+                //Inputfield for chat message
+
+                // @event.on('click', function(){ this.showRenderable('submitedmessage'); })
+
+                //Sendbutton
+
+                //le messages
+
+                //Main Background Color
+
+
+                return HomeView;
+            }(View), (_descriptor = _applyDecoratedDescriptor(_class$6.prototype, 'title', [_dec$4, _dec2$1, _dec3], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface({
+                        content: 'Arva Chat Appje',
+                        properties: {
+                            textAlign: 'center',
+                            color: 'black',
+                            fontSize: '50px'
+                        }
+                    });
+                }
+            }), _descriptor2 = _applyDecoratedDescriptor(_class$6.prototype, 'background', [_dec4, _dec5], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface({ properties: { backgroundColor: 'blanchedalmond' } });
+                }
+            }), _descriptor3 = _applyDecoratedDescriptor(_class$6.prototype, 'messages', [_dec6, _dec7, _dec8], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface({
+                        properties: {
+                            backgroundColor: 'lightblue'
+                        }
+                    });
+                }
+            }), _descriptor4 = _applyDecoratedDescriptor(_class$6.prototype, 'scrollView', [_dec9, _dec10, _dec11], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new DataBoundScrollView({
+                        layout: CollectionLayout,
+                        layoutOptions: {
+                            itemSize: [undefined, 30]
+                        },
+                        itemTemplate: function itemTemplate(chatmessage) {
+                            return new Surface({ content: '' + chatmessage.leMessage });
+                        },
+                        dataStore: new ChatMessages()
+                    });
+                }
+            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'footerspace', [_dec12, _dec13, _dec14], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface({});
+                }
+            }), _descriptor6 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec15, _dec16, _dec17], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new InputSurface({
+                        value: 'Send',
+                        type: 'button',
+                        properties: {
+                            backgroundColor: 'lightblue',
+                            borderRadius: '10px',
+                            marginTop: '10px'
+                        }
+                    });
+                }
+            }), _descriptor7 = _applyDecoratedDescriptor(_class$6.prototype, 'submitedmessage', [_dec18, _dec19, _dec20, _dec21], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new Surface();
+                }
+            }), _descriptor8 = _applyDecoratedDescriptor(_class$6.prototype, 'inputmessage', [_dec22, _dec23, _dec24], {
+                enumerable: true,
+                initializer: function initializer() {
+                    return new InputSurface({
+                        placeholder: '... ... ...',
+                        properties: {
+                            textAlign: 'center',
+                            color: 'black',
+                            padding: '20px'
+                        }
+                    });
+                }
+            })), _class$6));
 
             HomeController = function (_Controller) {
                 _inherits(HomeController, _Controller);
