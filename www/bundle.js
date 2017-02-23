@@ -56787,7 +56787,6 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                             this.homeView.inputmessage.on('keyup', function (e) {
                                 if (e.keyCode == 13) {
                                     console.log('pressed enter');
-                                    console.log(this.homeView.inputmessage.getValue());
                                     chatmessage.leMessage = this.homeView.inputmessage.getValue();
 
                                     chatmessages.on('child_added', function (chatmessage) {
@@ -56799,7 +56798,7 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                             this.homeView.sendbutton.on('click', function () {
                                 console.log('clicked button');
                                 chatmessage.leMessage = _this2.homeView.inputmessage.getValue();
-                                _this2.homeView.inputmessage.setValue('... ... ...');
+                                _this2.homeView.inputmessage.setValue('');
 
                                 chatmessages.on('child_added', function (chatmessage) {
                                     console.log('A new chatmessage appeared! It says ' + chatmessage.leMessage);
