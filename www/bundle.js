@@ -46887,7 +46887,7 @@ define("1a5", ["require", "exports", "module", "157", "1a3", "1a4"], function(re
 $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133', '198', '134', '135', '136', '153', '152', '13c', '143', '141', '144', '142', '12c', '12d', '146', '13d', '13e', '14a', '157', '14b', '13a', '14d', '151', '139', '140', '14e', '14f', '150', '13f', '138', '1a5', '145'], function (_export, _context3) {
     "use strict";
 
-    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, event, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _dec22, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, HomeView, HomeController, _class, _temp, App$$1;
+    var firebase, _, camelCase, ElementOutput, Bowser, hash, FastClick, Engine, Context, AnimationController, EventEmitter, Easing, Surface, FamousView, LayoutController, ImageSurface, LayoutUtility, OrderedHashMap, Transitionable, Draggable, ContainerSurface, Transform, Timer, GenericSync, MouseSync, TouchSync, RenderNode, Modifier, FlexScrollView, InputSurface, _classCallCheck, _createClass, _possibleConstructorReturn, _inherits, DataSource, ObjectHelper, ownKeys, SuperConstructor, TransientScope, Inject, Provide, ClassProvider, FactoryProvider, _slicedToArray, _dec, _class$1, FirebaseDataSource, browser, EmptyFunction, ClassProvider$1, FactoryProvider$1, Injector, _class$2, _temp$1, Injection, Router, _dec$2, _class$4, ArvaRouter, _dec$1, _class$3, _class2, _temp$2, _dec2, _class3, App$1, FamousContextSingleton, NewAnimationController, _dec$3, _class$5, Controller, _regeneratorRuntime, _asyncToGenerator, Utils, SizeResolver, _extends, BaseLayoutHelper, DockedLayoutHelper, FullSizeLayoutHelper, TraditionalLayoutHelper, Throttler, RenderableHelper, ReflowingScrollView, View, layout$1, event, flow, _dec$4, _dec2$1, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _dec22, _dec23, _class$6, _descriptor, _descriptor2, _descriptor3, _descriptor4, _descriptor5, _descriptor6, _descriptor7, HomeView, HomeController, _class, _temp, App$$1;
 
     // A bunch of helper functions.
 
@@ -55506,18 +55506,21 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
             HomeView = (_dec$4 = layout$1.size(1000, 100), _dec2$1 = layout$1.stick.top(), _dec3 = layout$1.animate({
                 animation: AnimationController.Animation.FadedZoom,
                 transition: { duration: 1000 }
-            }), _dec4 = layout$1.translate(0, 0, -10), _dec5 = layout$1.fullSize(), _dec6 = layout$1.size(500, 500), _dec7 = layout$1.stick.center(), _dec8 = layout$1.size(500, 50), _dec9 = layout$1.dock.bottom(), _dec10 = layout$1.stick.center(), _dec11 = layout$1.size(500, 50), _dec12 = layout$1.dock.bottom(), _dec13 = layout$1.stick.center(), _dec14 = event.on('click', function () {
+            }), _dec4 = layout$1.translate(0, 0, -10), _dec5 = layout$1.fullSize(), _dec6 = layout$1.translate(0, 0, -5), _dec7 = layout$1.size(500, 500), _dec8 = layout$1.stick.center(), _dec9 = layout$1.size(500, 50), _dec10 = layout$1.dock.bottom(), _dec11 = layout$1.stick.center(), _dec12 = layout$1.size(500, 50), _dec13 = layout$1.dock.bottom(), _dec14 = layout$1.stick.center(), _dec15 = event.on('click', function () {
                 this.showRenderable('submitedmessage');
-            }), _dec15 = layout$1.size(300, 25), _dec16 = layout$1.translate(0, 100, 0), _dec17 = layout$1.animate({
+            }), _dec16 = layout$1.size(500, 500), _dec17 = layout$1.stick.center(), _dec18 = layout$1.animate({
                 showInitially: false,
-                animation: AnimationController.Animation.Slide.Left,
+                animation: AnimationController.Animation.FadedZoom,
                 transition: { duration: 500 }
-            }), _dec18 = layout$1.stick.center(), _dec19 = layout$1.size(500, 100), _dec20 = layout$1.dock.bottom(), _dec21 = layout$1.stick.center(), _dec22 = event.on('keyup', function (e) {
+            }), _dec19 = layout$1.stick.center(), _dec20 = layout$1.size(500, 100), _dec21 = layout$1.dock.bottom(), _dec22 = layout$1.stick.center(), _dec23 = event.on('keyup', function (e) {
                 if (e.keyCode == 13) {
                     this.showRenderable('submitedmessage');
                 }
             }), (_class$6 = function (_View) {
                 _inherits(HomeView, _View);
+
+                //The Message
+
 
                 //Footer space
 
@@ -55559,10 +55562,11 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                 enumerable: true,
                 initializer: function initializer() {
                     return new Surface({
-                        content: 'Arva Chat App',
+                        content: 'Arva Chat Appje',
                         properties: {
                             textAlign: 'center',
-                            color: 'gray'
+                            color: 'black',
+                            fontSize: '50px'
                         }
                     });
                 }
@@ -55571,7 +55575,7 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                 initializer: function initializer() {
                     return new Surface({ properties: { backgroundColor: 'blanchedalmond' } });
                 }
-            }), _descriptor3 = _applyDecoratedDescriptor(_class$6.prototype, 'messages', [_dec6, _dec7], {
+            }), _descriptor3 = _applyDecoratedDescriptor(_class$6.prototype, 'messages', [_dec6, _dec7, _dec8], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new Surface({
@@ -55580,12 +55584,12 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                         }
                     });
                 }
-            }), _descriptor4 = _applyDecoratedDescriptor(_class$6.prototype, 'footerspace', [_dec8, _dec9, _dec10], {
+            }), _descriptor4 = _applyDecoratedDescriptor(_class$6.prototype, 'footerspace', [_dec9, _dec10, _dec11], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new Surface({});
                 }
-            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec11, _dec12, _dec13, _dec14], {
+            }), _descriptor5 = _applyDecoratedDescriptor(_class$6.prototype, 'sendbutton', [_dec12, _dec13, _dec14, _dec15], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new InputSurface({
@@ -55598,12 +55602,15 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                         }
                     });
                 }
-            }), _descriptor6 = _applyDecoratedDescriptor(_class$6.prototype, 'submitedmessage', [_dec15, _dec16, _dec17, _dec18], {
+            }), _descriptor6 = _applyDecoratedDescriptor(_class$6.prototype, 'submitedmessage', [_dec16, _dec17, _dec18, _dec19], {
                 enumerable: true,
                 initializer: function initializer() {
-                    return new Surface({ content: 'How to put the stuffss?', properties: { textAlign: 'center' } });
+                    return new Surface({
+                        content: this.chatmessage.getValue(),
+                        properties: { textAlign: 'left' }
+                    });
                 }
-            }), _descriptor7 = _applyDecoratedDescriptor(_class$6.prototype, 'chatmessage', [_dec19, _dec20, _dec21, _dec22], {
+            }), _descriptor7 = _applyDecoratedDescriptor(_class$6.prototype, 'chatmessage', [_dec20, _dec21, _dec22, _dec23], {
                 enumerable: true,
                 initializer: function initializer() {
                     return new InputSurface({
@@ -55630,7 +55637,7 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     key: 'Index',
                     value: function Index() {
                         if (!this.homeView) {
-                            this.homeView = new HomeView({});
+                            this.homeView = new HomeView({ newMessage: 'How to get value?' });
                         }
                         return this.homeView;
                     }
@@ -55662,10 +55669,10 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                     value: function defaultDataSource() {
                         /* Firebase initialization */
                         firebase.initializeApp({
-                            apiKey: '<api-key>',
-                            authDomain: '<subdomain>.firebaseapp.com',
-                            databaseURL: 'https://<subdomain>.firebaseio.com',
-                            storageBucket: '<subdomain>.appspot.com'
+                            apiKey: 'AIzaSyC-_GCWK00_FvFxqMyM-VJKDGc4HeRn2vg',
+                            authDomain: 'arvachatappje.firebaseapp.com',
+                            databaseURL: 'https://arvachatappje.firebaseio.com',
+                            storageBucket: 'arvachatappje.appspot.com'
                         });
                         return new FirebaseDataSource('/', {});
                     }
