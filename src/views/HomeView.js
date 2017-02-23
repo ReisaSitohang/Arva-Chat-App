@@ -42,11 +42,18 @@ export class HomeView extends View {
     @layout.size(500, 500)
     @layout.stick.center()
     scrollView = new DataBoundScrollView({
+    useContainer: true,
     layout: CollectionLayout,
     layoutOptions: {
-        itemSize: [undefined, 30]
+        margins: 10,
+        spacing: 5
     },
-    itemTemplate: (chatmessage) => new Surface({content: `${chatmessage.leMessage}`}),
+    itemTemplate: (chatmessage) => new Surface({
+    	content: `${chatmessage.leMessage}`,
+    	properties: {
+    		color: 'black'
+    	}
+    }),
     dataStore: new ChatMessages()
     })
 

@@ -57792,12 +57792,19 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                 enumerable: true,
                 initializer: function initializer() {
                     return new DataBoundScrollView({
+                        useContainer: true,
                         layout: CollectionLayout,
                         layoutOptions: {
-                            itemSize: [undefined, 30]
+                            margins: 10,
+                            spacing: 5
                         },
                         itemTemplate: function itemTemplate(chatmessage) {
-                            return new Surface({ content: '' + chatmessage.leMessage });
+                            return new Surface({
+                                content: '' + chatmessage.leMessage,
+                                properties: {
+                                    color: 'black'
+                                }
+                            });
                         },
                         dataStore: new ChatMessages()
                     });
