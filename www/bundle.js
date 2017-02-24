@@ -57792,6 +57792,7 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                 enumerable: true,
                 initializer: function initializer() {
                     return new DataBoundScrollView({
+                        chatScrolling: true,
                         useContainer: true,
                         layout: CollectionLayout,
                         layoutOptions: {
@@ -57869,11 +57870,9 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                             this.homeView.inputmessage.on('keyup', function (e) {
                                 if (e.keyCode == 13) {
                                     console.log('pressed enter');
-                                    chatmessage.leMessage = this.homeView.inputmessage.getValue();
-
-                                    chatmessages.on('child_added', function (chatmessage) {
-                                        console.log('A new chatmessage appeared! It says ' + chatmessage.leMessage);
-                                    });
+                                    chatmessage.leMessage = _this2.homeView.inputmessage.getValue();
+                                    _this2.homeView.inputmessage.setValue('');
+                                    console.log('pressed enter');
                                 }
                             });
                             //on click button event
@@ -57881,10 +57880,6 @@ $__System.register('1', ['12a', '12b', '12e', '12f', '130', '131', '132', '133',
                                 console.log('clicked button');
                                 chatmessage.leMessage = _this2.homeView.inputmessage.getValue();
                                 _this2.homeView.inputmessage.setValue('');
-
-                                chatmessages.on('child_added', function (chatmessage) {
-                                    console.log('A new chatmessage appeared! It says ' + chatmessage.leMessage);
-                                });
                             });
                         }
                         return this.homeView;

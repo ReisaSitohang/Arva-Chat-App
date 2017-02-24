@@ -42,6 +42,7 @@ export class HomeView extends View {
     @layout.size(500, 500)
     @layout.stick.center()
     scrollView = new DataBoundScrollView({
+    chatScrolling: true,	
     useContainer: true,
     layout: CollectionLayout,
     layoutOptions: {

@@ -10,23 +10,17 @@ export class HomeController extends Controller {
 		if(!this.homeView) {
 			this.homeView = new HomeView();
 			//on enter event
-			this.homeView.inputmessage.on('keyup', function(e) { if (e.keyCode == 13) { 
+			this.homeView.inputmessage.on('keyup', (e)=> { if (e.keyCode == 13) { 
 				console.log('pressed enter')
 				chatmessage.leMessage = this.homeView.inputmessage.getValue()
-
-				chatmessages.on('child_added', (chatmessage) => {
-					console.log(`A new chatmessage appeared! It says ${chatmessage.leMessage}`);
-				});
+				this.homeView.inputmessage.setValue('')
+				console.log('pressed enter')
 			}})
 			//on click button event
 			this.homeView.sendbutton.on('click', () => {   
 				console.log('clicked button')
 				chatmessage.leMessage = this.homeView.inputmessage.getValue()
 				this.homeView.inputmessage.setValue('')
-
-				chatmessages.on('child_added', (chatmessage) => {
-					console.log(`A new chatmessage appeared! It says ${chatmessage.leMessage}`);
-				});
 			})			
 		}
 		return this.homeView;
